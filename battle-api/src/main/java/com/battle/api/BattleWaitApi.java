@@ -47,7 +47,7 @@ public class BattleWaitApi {
 	public Object waitUsers(HttpServletRequest httpServletRequest)throws Exception{
 		
 		String waitId = httpServletRequest.getParameter("waitId");
-		List<BattleWaitUser> battleWaitUsers = battleWaitUserService.findAllByWaitId(waitId);
+		List<BattleWaitUser> battleWaitUsers = battleWaitUserService.findAllByWaitIdAndStatus(waitId, BattleWaitUser.READY_STATUS);
 		
 		
 		ResultVo resultVo = new ResultVo();
@@ -83,7 +83,7 @@ public class BattleWaitApi {
 			battleWaitService.update(battleWait);
 			
 			battleWaitUser = new BattleWaitUser();
-			battleWaitUser.setStatus(BattleWaitUser.INTO_STATUS);
+			battleWaitUser.setStatus(BattleWaitUser.READY_STATUS);
 			battleWaitUser.setUserId(userInfo.getId());
 			battleWaitUser.setWaitId(waitId);
 			battleWaitUser.setNickname(userInfo.getNickname());
@@ -94,7 +94,7 @@ public class BattleWaitApi {
 			battleWaitUserService.add(battleWaitUser);
 			battleWaitSocketService.waitPublish(battleWaitUser);
 		}else{
-			battleWaitUser.setStatus(BattleWaitUser.INTO_STATUS);
+			battleWaitUser.setStatus(BattleWaitUser.READY_STATUS);
 			battleWaitUserService.update(battleWaitUser);
 		}
 		
@@ -138,17 +138,33 @@ public class BattleWaitApi {
 		UserInfo userInfo = sessionManager.getObject(UserInfo.class);
 		String waitId = httpServletRequest.getParameter("waitId");
 		
-		BattleWaitUser battleWaitUser = battleWaitUserService.findOneByWaitIdAndUserId(waitId,userInfo.getId());
+		BattleWait battleWait = battleWaitService.findOne(waitId);
 		
-		battleWaitUser.setStatus(BattleWaitUser.OUT_STATUS);
+		BattleWaitUser battleWaitUser = battleWaitUserService.findOneByWaitIdAndUserIdAndStatus(waitId,userInfo.getId(),BattleWaitUser.READY_STATUS);
 		
-		battleWaitUserService.update(battleWaitUser);
+		if(battleWaitUser!=null){
+			Integer num = battleWait.getNum();
+			if(CommonUtil.isNotEmpty(num)){
+				num--;
+			}
+			
+			battleWait.setNum(num);
+			battleWaitUser.setStatus(BattleWaitUser.OUT_STATUS);
+			
+			battleWaitUserService.update(battleWaitUser);
+			
+			battleWaitSocketService.waitPublish(battleWaitUser);
+			ResultVo resultVo = new ResultVo();
+			resultVo.setSuccess(true);
+			resultVo.setData(battleWaitUser);
+			return resultVo;
+		}else{
+			ResultVo resultVo = new ResultVo();
+			resultVo.setSuccess(false);
+			return resultVo;
+		}
 		
-		battleWaitSocketService.waitPublish(battleWaitUser);
-		ResultVo resultVo = new ResultVo();
-		resultVo.setSuccess(true);
-		resultVo.setData(battleWaitUser);
-		return resultVo;
+		
 	}
 	
 }

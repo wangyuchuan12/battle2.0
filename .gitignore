@@ -1,1 +1,11 @@
 /build/
+/.gradle/
+/bin
+/.git
+.gradle
+.bin
+.classpath
+.class
+.core.prefs
+
+.settings/gradle/org.springsource.ide.eclipse.gradle.core.prefs

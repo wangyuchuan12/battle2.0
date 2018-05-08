@@ -33,7 +33,7 @@ public class BattleWaitSocketService {
 			public void run() {
 				try{
 					
-					List<BattleWaitUser> battleWaitUsers = battleWaitUserService.findAllByWaitId(waitId);
+					List<BattleWaitUser> battleWaitUsers = battleWaitUserService.findAllByWaitIdAndStatus(waitId,BattleWaitUser.READY_STATUS);
 					List<String> userIds = new ArrayList<>();
 					for(BattleWaitUser battleWaitUser:battleWaitUsers){
 						String userId = battleWaitUser.getUserId();

@@ -47,4 +47,10 @@ public class BattleWaitUserService {
 		
 		return battleWaitUserDao.findAllByWaitIdAndStatus(waitId,status);
 	}
+
+	public BattleWaitUser findOneByWaitIdAndUserIdAndStatus(String waitId, String userId, Integer status) {
+		
+		return battleWaitUserDao.findOneByWaitIdAndUserIdAndStatus(waitId,userId,status);
+		
+	}
 }

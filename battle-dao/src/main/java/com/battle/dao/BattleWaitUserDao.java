@@ -14,4 +14,6 @@ public interface BattleWaitUserDao extends CrudRepository<BattleWaitUser, String
 
 	List<BattleWaitUser> findAllByWaitIdAndStatus(String waitId, Integer status);
 
+	BattleWaitUser findOneByWaitIdAndUserIdAndStatus(String waitId, String userId, Integer status);
+
 }

@@ -115,18 +115,20 @@ public class InitRoomService {
 		}
 		addRoom(battleRoom);
 		
+		System.out.println(".......................addRoom");
 		Timer timer = new Timer();
 		
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				List<BattleWaitUser> battleWaitUsers = battleWaitUserService.findAllByWaitId(waitId);
+				List<BattleWaitUser> battleWaitUsers = battleWaitUserService.findAllByWaitIdAndStatus(waitId,BattleWaitUser.READY_STATUS);
+				
+				System.out.println(".............battleWaitUsers:"+battleWaitUsers);
 				List<Map<String, Object>> users = new ArrayList<>();
 				
 				for(BattleWaitUser battleWaitUser:battleWaitUsers){
 					
 					Map<String, Object> user = new HashMap<>();
-					user.put("userId", battleWaitUser.getUserId());
 					String danUserId = battleWaitUser.getDanUserId();
 					if(CommonUtil.isNotEmpty(danUserId)){
 						BattleDanUser battleDanUser = battleDanUserService.findOne(danUserId);
@@ -136,6 +138,8 @@ public class InitRoomService {
 						
 						battleDanUserService.update(battleDanUser);
 					}
+					
+					user.put("userId", battleWaitUser.getUserId());
 
 					users.add(user);
 				}
@@ -145,7 +149,7 @@ public class InitRoomService {
 					logger.error("{}",e);
 				}
 				
-				System.out.println("............roomTakepart:"+users);
+				System.out.println(".............users:"+users);
 				
 				roomTakapertService.takepart(battleRoom, users);
 				
