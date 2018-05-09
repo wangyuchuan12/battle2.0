@@ -94,7 +94,16 @@ public class BattleWaitApi {
 			battleWaitUserService.add(battleWaitUser);
 			battleWaitSocketService.waitPublish(battleWaitUser);
 		}else{
+			
+			BattleWait battleWait = battleWaitService.findOne(waitId);
+			Integer num = battleWait.getNum();
+			if(num==null){
+				num = 0;
+			}
+			num++;
+			battleWait.setNum(num);
 			battleWaitUser.setStatus(BattleWaitUser.READY_STATUS);
+			battleWaitService.update(battleWait);
 			battleWaitUserService.update(battleWaitUser);
 		}
 		
