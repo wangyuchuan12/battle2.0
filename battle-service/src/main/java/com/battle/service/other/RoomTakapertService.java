@@ -13,7 +13,6 @@ import com.battle.domain.BattleRoom;
 import com.battle.domain.BattleUser;
 import com.battle.service.BattlePeriodMemberService;
 import com.battle.service.BattlePeriodService;
-import com.battle.service.BattleRoomService;
 import com.battle.service.BattleUserService;
 import com.wyc.common.service.WxUserInfoService;
 import com.wyc.common.util.CommonUtil;
@@ -35,6 +34,7 @@ public class RoomTakapertService {
 	
 	@Autowired
 	private BattlePeriodService battlePeriodService;
+	
 	public void takepart(BattleRoom battleRoom,List<Map<String, Object>> users){
 		
 		Integer num = battleRoom.getNum();
