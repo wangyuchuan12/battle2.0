@@ -50,7 +50,7 @@ public class SocketHandler extends TextWebSocketHandler {
     	
     	sessionMap.remove(token.toString());
     	
-    	
+    	/*
     	Timer timer = new Timer();
     	
     	TimerTask timerTask = new TimerTask() {
@@ -69,7 +69,10 @@ public class SocketHandler extends TextWebSocketHandler {
 			}
 		};
 		
-		timer.schedule(timerTask, 100);
+		timer.schedule(timerTask, 100);*/
+    	
+    	sessionMap.put(token.toString(),session);
+		onlineListener.onLine(userId.toString());
     	
 		SocketHandler.super.afterConnectionEstablished(session);
     	
@@ -83,6 +86,7 @@ public class SocketHandler extends TextWebSocketHandler {
     	Object token = attributes.get("token");
     	final Object userId = attributes.get("userId");
     	
+    	/*
     	Timer timer = new Timer();
     	
     	TimerTask timerTask = new TimerTask() {
@@ -93,7 +97,9 @@ public class SocketHandler extends TextWebSocketHandler {
 			}
 		};
 		
-		timer.schedule(timerTask,500);
+		timer.schedule(timerTask,500);*/
+    	
+    	onlineListener.downLine(userId.toString());
 		
     	sessionMap.remove(token.toString());
         super.afterConnectionClosed(session, status);
