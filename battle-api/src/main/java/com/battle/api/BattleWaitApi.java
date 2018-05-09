@@ -105,6 +105,7 @@ public class BattleWaitApi {
 			battleWaitUser.setStatus(BattleWaitUser.READY_STATUS);
 			battleWaitService.update(battleWait);
 			battleWaitUserService.update(battleWaitUser);
+			battleWaitSocketService.waitPublish(battleWaitUser);
 		}
 		
 		ResultVo resultVo = new ResultVo();
