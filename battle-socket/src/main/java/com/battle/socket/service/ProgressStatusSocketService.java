@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,10 +28,11 @@ public class ProgressStatusSocketService {
 	@Autowired
 	private BattleRoomService battleRoomService;
 	
-	
+	@Autowired
+	private ScheduledExecutorService executorService;
 	public void statusPublish(final String roomId,final BattlePeriodMember battlePeriodMember,final String ...excludeIds){
 		
-		new Thread(){
+		Thread thread = new Thread(){
 			public void run() {
 				List<ProgressStatusVo> progressStatusVos = new ArrayList<>();
 				
@@ -53,7 +55,7 @@ public class ProgressStatusSocketService {
 				messageVo.setType(MessageVo.ROOM_TYPE);
 				messageVo.setRoomId(roomId);
 				messageVo.setData(progressStatusVos);
-				messageVo.setExcludeUserIds(Arrays.asList(excludeIds));
+				//messageVo.setExcludeUserIds(Arrays.asList(excludeIds));
 				
 				try {
 					messageHandler.sendMessage(messageVo);
@@ -62,14 +64,16 @@ public class ProgressStatusSocketService {
 					e.printStackTrace();
 				}
 			}
-		}.start();
+		};
+		
+		executorService.submit(thread);
 	
 	}
 	
 	public void statusPublish(final String roomId,final String ...excludeIds){
 		
 		
-		new Thread(){
+		Thread thread = new Thread(){
 			public void run() {
 				BattleRoom battleRoom = battleRoomService.findOne(roomId);
 				List<BattlePeriodMember> battlePeriodMembers = battlePeriodMemberService.findAllByBattleIdAndPeriodIdAndRoomId(battleRoom.getBattleId(), battleRoom.getPeriodId(), battleRoom.getId());
@@ -102,6 +106,8 @@ public class ProgressStatusSocketService {
 				}
 				
 			}
-		}.start();
+		};
+		
+		executorService.submit(thread);
 	}
 }

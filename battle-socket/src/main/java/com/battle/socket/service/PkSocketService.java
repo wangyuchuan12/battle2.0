@@ -2,6 +2,8 @@ package com.battle.socket.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.battle.domain.BattlePk;
@@ -16,10 +18,15 @@ public class PkSocketService {
 	@Autowired
 	private MessageHandler messageHandler;
 	
+	@Autowired
+	private ScheduledExecutorService executorService;
+	
 	public void statusPublish(final BattlePk battlePk){
 		
-		new Thread(){
+		System.out.println("............这里有没有进来");
+		Thread thread = new Thread(){
 			public void run() {
+				System.out.println("..............这里也进来了");
 				PkStatusVo pkStatusVo = new PkStatusVo();
 				pkStatusVo.setBattleId(battlePk.getBattleId());
 				pkStatusVo.setRoomId(battlePk.getRoomId());
@@ -44,6 +51,8 @@ public class PkSocketService {
 					userIds.add(battlePk.getHomeUserId());
 				}
 				
+				System.out.println("............userIds:"+userIds);
+				
 				messageVo.setUserIds(userIds);
 				messageVo.setCode(MessageVo.PK_STATUS_CODE);
 				messageVo.setType(MessageVo.USERS_TYPE);
@@ -55,7 +64,9 @@ public class PkSocketService {
 					e.printStackTrace();
 				}
 			}
-		}.start();
+		};
+		
+		executorService.submit(thread);
 		
 	}
 }

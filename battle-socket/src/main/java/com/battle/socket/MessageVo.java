@@ -25,6 +25,8 @@ public class MessageVo {
 	public final static String WAIT_STATUS_CODE = "waitStatusCode";
 	public final static String WAIT_END_CODE = "waitEndCode";
 	
+	public final static String STAGE_REST_CODE = "stageRestCode";
+	
 	//调用编号
 	private String code;
 	

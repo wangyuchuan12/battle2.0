@@ -5,6 +5,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 import javax.net.ssl.SSLContext;
 import javax.transaction.Transactional;
 
@@ -50,6 +54,13 @@ public class AppConfig{
 	    @Bean
 	    public ApplicationContextProvider applicationContextProvider() {
 	        return new ApplicationContextProvider();
+	    }
+	    
+	    @Bean
+	    public ScheduledExecutorService executorService(){
+	    	
+	    	ScheduledExecutorService executorService = Executors.newScheduledThreadPool(10);
+	    	return executorService;
 	    }
 	    
 	    @Bean

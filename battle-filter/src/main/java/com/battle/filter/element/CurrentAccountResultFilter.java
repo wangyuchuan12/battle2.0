@@ -19,7 +19,11 @@ public class CurrentAccountResultFilter extends Filter{
 	public Object handlerFilter(SessionManager sessionManager) throws Exception {
 		UserInfo userInfo = sessionManager.getObject(UserInfo.class);
 		
+		System.out.println("............userInfo:"+userInfo);
+		
 		BattleAccountResult battleAccountResult = battleAccountResultService.findOneByUserId(userInfo.getId());
+		
+		System.out.println("............battleAccountResult:"+battleAccountResult);
 		
 		if(battleAccountResult==null){
 			battleAccountResult = new BattleAccountResult();

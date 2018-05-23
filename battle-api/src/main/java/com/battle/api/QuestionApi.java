@@ -29,6 +29,7 @@ import com.battle.domain.BattlePeriodMember;
 import com.battle.domain.BattlePeriodStage;
 import com.battle.domain.BattleQuestion;
 import com.battle.domain.BattleRoom;
+import com.battle.domain.BattleStageRestMember;
 import com.battle.domain.Question;
 import com.battle.domain.QuestionAnswer;
 import com.battle.domain.QuestionAnswerItem;
@@ -44,11 +45,13 @@ import com.battle.service.BattlePeriodMemberService;
 import com.battle.service.BattlePeriodStageService;
 import com.battle.service.BattleQuestionService;
 import com.battle.service.BattleRoomService;
+import com.battle.service.BattleStageRestMemberService;
 import com.battle.service.QuestionAnswerItemService;
 import com.battle.service.QuestionAnswerService;
 import com.battle.service.QuestionOptionService;
 import com.battle.service.QuestionService;
 import com.battle.service.other.AccountResultHandleService;
+import com.battle.service.other.BattleStageRestHandleService;
 import com.battle.socket.service.ProgressStatusSocketService;
 import com.wyc.annotation.HandlerAnnotation;
 import com.wyc.common.domain.Account;
@@ -107,6 +110,9 @@ public class QuestionApi {
 	
 	@Autowired
 	private ProgressStatusSocketService progressStatusSocketService;
+	
+	@Autowired
+	private BattleStageRestMemberService battleStageRestMemberService;
 	
 
 	final static Logger logger = LoggerFactory.getLogger(QuestionApi.class);
@@ -169,7 +175,7 @@ public class QuestionApi {
 		
 		System.out.println("member.stageIndex:"+battlePeriodMember.getStageIndex());
 		
-		Integer stageIndex = battlePeriodMember.getStageIndex()-1;
+		Integer stageIndex = battlePeriodMember.getStageIndex();
 		
 		Question question = questionService.findOne(id);
 		
@@ -270,7 +276,7 @@ public class QuestionApi {
 			questionAnswerItem.setRightAnswer(question.getAnswer());
 			battleMemberQuestionAnswer.setAnswer(answer);
 			battleMemberQuestionAnswer.setRightAnswer(question.getAnswer());
-			if(answer!=null&&answer.equals(question.getAnswer())){
+			if(CommonUtil.isNotEmpty(answer)&&answer.equals(question.getAnswer())){
 				
 				questionAnswerItem.setIsRight(1);
 				
@@ -285,12 +291,12 @@ public class QuestionApi {
 		}else if(question.getType()==Question.FILL_TYPE){
 			String answer = httpServletRequest.getParameter("answer");
 			
+			
 			questionAnswerItem.setMyAnswer(answer);
 			questionAnswerItem.setRightAnswer(question.getAnswer());
 			battleMemberQuestionAnswer.setAnswer(answer);
 			battleMemberQuestionAnswer.setRightAnswer(question.getAnswer());
-			if(answer!=null&&answer.equals(question.getAnswer())){
-				
+			if(CommonUtil.isNotEmpty(answer)&&answer.equals(question.getAnswer())){
 				questionAnswerItem.setIsRight(1);
 				
 			}else{
@@ -303,9 +309,6 @@ public class QuestionApi {
 			resultVo.setData(result);
 			
 		}
-		
-		
-		
 		
 		
 		Integer answerCount = battleMemberPaperAnswer.getAnswerCount();
@@ -412,6 +415,16 @@ public class QuestionApi {
 		
 		battlePeriodMember.setProcess(endIndex);
 		
+		
+		BattleStageRestMember battleStageRestMember = battleStageRestMemberService.findOneByRoomIdAndMemberId(battlePeriodMember.getRoomId(), battlePeriodMember.getId());
+		if(battleStageRestMember!=null){
+			battleStageRestMember.setThisProcess(battleMemberPaperAnswer.getProcess());
+			battleStageRestMember.setProcess(battlePeriodMember.getProcess());
+			battleStageRestMember.setLoveResidule(battlePeriodMember.getLoveResidule());
+			battleStageRestMember.setIsOnline(1);
+			battleStageRestMemberService.update(battleStageRestMember);
+		}
+		
 		if(questionAnswerItem.getIsRight()==1){
 			
 			result.put("right", true);
@@ -461,21 +474,25 @@ public class QuestionApi {
 			accountService.update(account);
 		}
 		
-		
-		
-		
-		
 		result.put("battleMemberQuestionAnswerId",battleMemberQuestionAnswer.getId());
 		
 		result.put("battleMemberPaperAnswerId",battleMemberPaperAnswer.getId());
 		
+		result.put("thisProcess",battleMemberPaperAnswer.getProcess());
+		
 		result.put("rewardBean", battleMemberPaperAnswer.getThisRewardBean());
+		
+		result.put("stageIndex", battleMemberPaperAnswer.getStageIndex());
 		
 		result.put("isPass", battleMemberPaperAnswer.getIsPass());
 		
 		result.put("memberProcess", battlePeriodMember.getProcess());
 		
 		result.put("loveResidule", battlePeriodMember.getLoveResidule());
+		
+		result.put("imgUrl", battlePeriodMember.getHeadImg());
+		
+		result.put("processGogal", battlePeriodMember.getProcessGogal());
 		
 		questionAnswerItemService.add(questionAnswerItem);
 		
@@ -490,24 +507,14 @@ public class QuestionApi {
 		}
 		
 		result.put("memberScore", battlePeriodMember.getScore());
-		
-		
-		
+
 		battlePeriodMemberService.update(battlePeriodMember);
 		battleMemberQuestionAnswerService.add(battleMemberQuestionAnswer);
 		
 		sessionManager.update(questionAnswer);
 		sessionManager.update(battleMemberPaperAnswer);
 	
-		new Thread(){
-			public void run() {
-				try{
-					progressStatusSocketService.statusPublish(battlePeriodMember.getRoomId(), battlePeriodMember,battlePeriodMember.getUserId());
-				}catch(Exception e){
-					logger.error("{}",e);
-				}
-			}
-		}.start();
+		progressStatusSocketService.statusPublish(battlePeriodMember.getRoomId(), battlePeriodMember,battlePeriodMember.getUserId());
 		
 		return resultVo;
 	}
@@ -523,8 +530,7 @@ public class QuestionApi {
 		String type = httpServletRequest.getParameter("type");
 
 		String questions = httpServletRequest.getParameter("questions");
-		
-		
+
 		BattlePeriodMember battlePeriodMember = sessionManager.getObject(BattlePeriodMember.class);
 		
 		BattleRoom battleRoom = sessionManager.findOne(BattleRoom.class, battlePeriodMember.getRoomId());
@@ -534,22 +540,24 @@ public class QuestionApi {
 		if(battlePeriodMember.getStatus()==BattlePeriodMember.STATUS_IN){
 			
 			battlePeriodMember.setStageIndex(stageIndex+1);
-			
 			battlePeriodMemberService.update(battlePeriodMember);
+		
 		}else{
 			
-			ResultVo result = new ResultVo();
-			
+			ResultVo result = new ResultVo();	
 			result.setSuccess(false);
 			result.setErrorMsg("不是正在进行中状态");
 			return result;
+		
 		}
-		
-		
 		
 		BattlePeriodStage battlePeriodStage = battlePeriodStageService.
 				findOneByBattleIdAndPeriodIdAndIndex(battlePeriodMember.getBattleId(), 
 						battlePeriodMember.getPeriodId(), stageIndex);
+		
+		//BattleStageRest battleStageRest = battleStageRestService.findOneByRoomIdAndStageIndex(battleRoom.getId(), stageIndex);
+		//battleStageRestHandleService.creteMembers(battleStageRest.getId());
+		
 		Integer passCount = battlePeriodStage.getPassCount();
 		
 		if(passCount==null){
@@ -571,7 +579,7 @@ public class QuestionApi {
 		
 		questionAnswer.setQuestions(questions);
 		questionAnswer.setRightSum(0);
-		questionAnswer.setTargetId(memberId+"_"+stageIndex);
+		questionAnswer.setTargetId(memberId+"_"+battlePeriodMember.getStageIndex());
 		questionAnswer.setType(Integer.parseInt(type));
 		questionAnswer.setWrongSum(0);
 		questionAnswer.setQuestionCount(questions.length());
@@ -583,7 +591,6 @@ public class QuestionApi {
 		battleMemberPaperAnswer.setAddDistance(0);
 		battleMemberPaperAnswer.setBattlePeriodMemberId(memberId);
 		battleMemberPaperAnswer.setRightSum(0);
-		battleMemberPaperAnswer.setStageIndex(stageIndex);
 		battleMemberPaperAnswer.setSubLove(0);
 		battleMemberPaperAnswer.setWrongSum(0);
 		battleMemberPaperAnswer.setStatus(BattleMemberPaperAnswer.FREE_STATUS);
@@ -595,24 +602,20 @@ public class QuestionApi {
 		battleMemberPaperAnswer.setPassRewardBean(passRewardBean);
 		battleMemberPaperAnswer.setThisRewardBean(0L);
 		battleMemberPaperAnswer.setIsSyncData(0);
-		
-
 		battleMemberPaperAnswer.setRightAddScore(battleRoom.getRightAddScore());
 		battleMemberPaperAnswer.setWrongSubScore(battleRoom.getWrongSubScore());
-		
+		battleMemberPaperAnswer.setStageIndex(battlePeriodMember.getStageIndex());
 		battleMemberPaperAnswer.setStartIndex(battlePeriodMember.getProcess());
-		
 		battleMemberPaperAnswer.setEndIndex(battlePeriodMember.getProcess());
-		
 		battleMemberPaperAnswer.setIsReceive(0);
 		
 		battleMemberPaperAnswerService.add(battleMemberPaperAnswer);
-		
+
 		ResultVo resultVo = new ResultVo();
 		
 		data.put("battleMemberPaperAnswerId", battleMemberPaperAnswer.getId());
 		
-		data.put("stageIndex",stageIndex);
+		data.put("stageIndex",battlePeriodMember.getStageIndex());
 		
 		resultVo.setData(data);
 		
@@ -621,8 +624,7 @@ public class QuestionApi {
 		return resultVo;
 		
 	}
-	
-	
+		
 	@RequestMapping(value="questionResults")
 	@ResponseBody
 	@Transactional
@@ -640,29 +642,23 @@ public class QuestionApi {
 		Map<String, Object> data = new HashMap<>();
 		
 		List<BattleMemberQuestionAnswer> battleMemberQuestionAnswers = battleMemberQuestionAnswerService.findAllByBattleMemberPaperAnswerId(battleMemberPaperAnswerId);
-		
-		
+
 		if(battlePeriodMember.getStageIndex()>battlePeriodMember.getStageCount()){
-			battlePeriodMember.setStatus(BattlePeriodMember.STATUS_COMPLETE);
 			
+			battlePeriodMember.setStatus(BattlePeriodMember.STATUS_COMPLETE);			
 			battlePeriodMemberService.update(battlePeriodMember);
-			
-			
+
 			BattleRoom battleRoom = battleRoomService.findOne(battlePeriodMember.getRoomId());
 			
 			if(battleRoom.getEndEnable()!=null&&battleRoom.getEndEnable()==1){
 				battleRoom.setStatus(BattleRoom.STATUS_END);
-				
 				battleRoom.setEndType(BattleRoom.CLEARANCE_END_TYPE);
-				
 				battleRoomService.update(battleRoom);
 			}
 		}
 		
 		BattleAccountResult battleAccountResult = sessionManager.getObject(BattleAccountResult.class);
-		
-		
-		
+
 		/*Integer processAll = battlePeriodMember.getProcess();
 		
 		if(processAll==null){
@@ -691,9 +687,7 @@ public class QuestionApi {
 		data.put("process", battleMemberPaperAnswer.getProcess());
 		
 		data.put("rewardBean", battleMemberPaperAnswer.getThisRewardBean());
-		
-		
-		
+
 		accountResultHandleService.answerResult(battleMemberPaperAnswer, battleAccountResult);
 		
 		data.put("addExp", battleMemberPaperAnswer.getExp());
@@ -703,7 +697,6 @@ public class QuestionApi {
 		ResultVo resultVo = new ResultVo();
 		resultVo.setData(data);
 		resultVo.setSuccess(true);
-		
 		return resultVo;
 	}
 	

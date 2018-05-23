@@ -152,6 +152,14 @@ public class BattleMemberPaperAnswer  implements Serializable{
 	private Integer isReceive;
 	
 	@ParamAnnotation
+	@Column
+	private String questions;
+	
+	@ParamAnnotation
+	@Column
+	private String subjects;
+	
+	@ParamAnnotation
 	@Column(name = "create_at")
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     @JsonIgnore
@@ -368,6 +376,22 @@ public class BattleMemberPaperAnswer  implements Serializable{
 
 	public void setIsReceive(Integer isReceive) {
 		this.isReceive = isReceive;
+	}
+	
+	public String getQuestions() {
+		return questions;
+	}
+
+	public void setQuestions(String questions) {
+		this.questions = questions;
+	}
+
+	public String getSubjects() {
+		return subjects;
+	}
+
+	public void setSubjects(String subjects) {
+		this.subjects = subjects;
 	}
 
 	public DateTime getCreateAt() {

@@ -52,6 +52,10 @@ public class BattleDan {
 	private Integer scoreGogal;
 	
 	@ParamAnnotation
+	@Column(name="process_gogal")
+	private Integer processGogal;
+	
+	@ParamAnnotation
 	@Column(name="battle_id")
 	private String battleId;
 	
@@ -243,6 +247,14 @@ public class BattleDan {
 
 	public void setLoveCount(Integer loveCount) {
 		this.loveCount = loveCount;
+	}
+	
+	public Integer getProcessGogal() {
+		return processGogal;
+	}
+
+	public void setProcessGogal(Integer processGogal) {
+		this.processGogal = processGogal;
 	}
 
 	public DateTime getCreateAt() {

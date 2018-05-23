@@ -70,4 +70,10 @@ public class BattleQuestionService {
 		
 		return battleQuestionDao.getQuestionNumByStageIdsAndSubjectIds(stageIds,subjectIds);
 	}
+
+	public List<BattleQuestion> findAllByBattleIdAndBattleSubjectIdRandom(String battleId, String subjectId,
+			Pageable pageable) {
+		
+		return battleQuestionDao.findAllByBattleIdAndBattleSubjectIdRandom(battleId,subjectId,pageable);
+	}
 }

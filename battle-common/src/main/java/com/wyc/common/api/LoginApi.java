@@ -1,6 +1,8 @@
 package com.wyc.common.api;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,49 +46,31 @@ public class LoginApi{
 	@RequestMapping(value="loginByJsCode")
 	public Object loginByJsCode(HttpServletRequest httpServletRequest)throws Exception{
 		SessionManager sessionManager = SessionManager.getFilterManager(httpServletRequest);
+		
+		
 		String token = null;
 		UserInfo userInfo = null;
 		token = httpServletRequest.getParameter("token");
+		
+		userInfo = sessionManager.getObject(UserInfo.class);
 		if(!CommonUtil.isEmpty(token)){
 			userInfo = wxUserInfoService.findByToken(token);
 		}
 		
-		
-			
+		String openId = null;
 		if(userInfo==null){
-			String code =httpServletRequest.getParameter("code");
+			String code = httpServletRequest.getParameter("code");
+			if(CommonUtil.isNotEmpty(code)){
 			
-			OpenIdVo openIdVo = null;
-			
-			try{
-				openIdVo = userService.getOpenIdFromJsCode(code);
-			}catch(Exception e){
-				ResultVo resultVo = new ResultVo();
-				resultVo.setSuccess(false);
-				resultVo.setErrorMsg("重新登录");
-				resultVo.setErrorCode(0);
+				OpenIdVo openIdVo = userService.getOpenIdFromJsCode(code);
 				
-				logger.error("登录时获取openId错误");
+				openId= openIdVo.getOpenid();
 				
-				return resultVo;
+				userInfo = wxUserInfoService.findByOpenidAndSource(openId,1);
 			}
-			
-			if(openIdVo==null){
-				logger.error("登录时获取的openId对象为空");
-				ResultVo resultVo = new ResultVo();
-				resultVo.setSuccess(false);
-				resultVo.setErrorMsg("重新登录");
-				resultVo.setErrorCode(1);
-				return resultVo;
-			}
-			
-			String openId = openIdVo.getOpenid();
-			
-			
-			
-			userInfo = wxUserInfoService.findByOpenidAndSource(openId,1);
 		}
 		
+
 		if(userInfo!=null){
 			LoginVo loginVo = new LoginVo();
 			token = UUID.randomUUID().toString();
@@ -122,6 +106,10 @@ public class LoginApi{
 			resultVo.setSuccess(false);
 			resultVo.setErrorMsg("用户未注册");
 			
+			Map<String, Object> data = new HashMap<>();
+			
+			data.put("openId", openId);
+			resultVo.setData(data);
 			resultVo.setErrorCode(401);
 			return resultVo;
 		}
@@ -205,7 +193,7 @@ public class LoginApi{
 	@ResponseBody
 	@RequestMapping(value="registerUserByJsCode")
 	public Object registerUser(HttpServletRequest httpServletRequest)throws Exception{
-		String code = httpServletRequest.getParameter("code");
+		
 		String nickName  = httpServletRequest.getParameter("nickName");
 		String gender = httpServletRequest.getParameter("gender");
 		String language = httpServletRequest.getParameter("language");
@@ -213,13 +201,21 @@ public class LoginApi{
 		String province = httpServletRequest.getParameter("province");
 		String country = httpServletRequest.getParameter("country");
 		String avatarUrl = httpServletRequest.getParameter("avatarUrl");
-	
 		
-		OpenIdVo openIdVo = userService.getOpenIdFromJsCode(code);
+		String signature = httpServletRequest.getParameter("signature");
 		
-		String openId = openIdVo.getOpenid();
+		String openId = httpServletRequest.getParameter("openId");
+		
+		
+		if(CommonUtil.isEmpty(openId)){
+			String code = httpServletRequest.getParameter("code");
+			OpenIdVo openIdVo = userService.getOpenIdFromJsCode(code);
+			openId = openIdVo.getOpenid();
+		}
 		
 		UserInfo userInfo = wxUserInfoService.findByOpenidAndSource(openId,1);
+		
+		//userInfo = wxUserInfoService.findOneBySignature(signature);
 		if(userInfo==null){
 			Account account = initAccount();
 			
@@ -238,6 +234,7 @@ public class LoginApi{
 			userInfo.setToken(UUID.randomUUID().toString());
 			userInfo.setIsCreateFrendGroup(0);
 			userInfo.setIsSyncDan(0);
+			userInfo.setSignature(signature);
 			wxUserInfoService.add(userInfo);
 
 			
@@ -257,6 +254,11 @@ public class LoginApi{
 		
 		
 		ResultVo resultVo = new ResultVo();
+		
+		Map<String, Object> data = new HashMap<>();
+		data.put("token", userInfo.getToken());
+		
+		resultVo.setData(data);
 		resultVo.setSuccess(true);
 		
 		return resultVo;

@@ -51,7 +51,7 @@ public class CurrentBattleUserFilter extends Filter{
 			return null;
 		}
 		
-		if(CommonUtil.isEmpty(openId)){
+		/*if(CommonUtil.isEmpty(openId)){
 			ResultVo resultVo = new ResultVo();
 			resultVo.setSuccess(false);
 			resultVo.setErrorMsg("openId不能为空");
@@ -60,7 +60,7 @@ public class CurrentBattleUserFilter extends Filter{
 			sessionManager.setReturnValue(resultVo);
 			
 			return null;
-		}
+		}*/
 		
 		if(battleUser==null){
 			battleUser = new BattleUser();

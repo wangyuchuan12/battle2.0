@@ -1,6 +1,7 @@
 package com.battle.socket;
 
-import javax.transaction.Transactional;
+import java.util.List;
+
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -12,10 +13,11 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import com.battle.domain.DataView;
+import com.battle.domain.BattleStageRestMember;
 import com.battle.domain.UserStatus;
-import com.battle.service.DataViewService;
+import com.battle.service.BattleStageRestMemberService;
 import com.battle.service.UserStatusService;
+import com.battle.socket.service.BattleStageRestPublishService;
 import com.wyc.common.service.WxUserInfoService;
 import com.wyc.common.util.CommonUtil;
 import com.wyc.common.wx.domain.UserInfo;
@@ -30,10 +32,13 @@ public class OnlineListener {
 	private UserStatusService userStatusService;
 	
 	@Autowired
-	private DataViewService dataViewService;
+    private PlatformTransactionManager platformTransactionManager;
 	
 	@Autowired
-    private PlatformTransactionManager platformTransactionManager;
+	private BattleStageRestMemberService battleStageRestMemberService;
+	
+	@Autowired
+	private BattleStageRestPublishService battleStageRestPublishService;
 
 	final static Logger logger = LoggerFactory.getLogger(OnlineListener.class);
 	public synchronized void onLine(final String id){
@@ -80,6 +85,19 @@ public class OnlineListener {
 		userStatus.setIsLine(1);
 		userStatus.setOnLineAt(new DateTime());
 		
+		List<BattleStageRestMember> battleStageRestMembers = battleStageRestMemberService.findAllByUserId(userInfo.getId());
+		if(battleStageRestMembers!=null&&battleStageRestMembers.size()>0){
+			for(BattleStageRestMember battleStageRestMember:battleStageRestMembers){
+				battleStageRestMember.setIsOnline(1);
+				battleStageRestMemberService.update(battleStageRestMember);
+				try{
+					battleStageRestPublishService.stageRestMemberStatusPublish(battleStageRestMember);
+				}catch(Exception e){
+					logger.error("{}",e);
+				}
+			}
+		}
+		
 		userStatusService.update(userStatus);
 		platformTransactionManager.commit(transactionStatus);
 		
@@ -107,6 +125,21 @@ public class OnlineListener {
     	
     	TransactionStatus transactionStatus = platformTransactionManager.getTransaction(def);
 		UserInfo userInfo = userInfoService.findOne(id);
+		
+		List<BattleStageRestMember> battleStageRestMembers = battleStageRestMemberService.findAllByUserId(userInfo.getId());
+		
+		if(battleStageRestMembers!=null&&battleStageRestMembers.size()>0){
+			for(BattleStageRestMember battleStageRestMember:battleStageRestMembers){
+				battleStageRestMember.setIsOnline(0);
+				battleStageRestMember.setStatus(BattleStageRestMember.OUT_STATUS);
+				battleStageRestMemberService.update(battleStageRestMember);
+				try{
+					battleStageRestPublishService.stageRestMemberStatusPublish(battleStageRestMember);
+				}catch(Exception e){
+					logger.error("{}",e);
+				}
+			}
+		}
 		
 		String statusId = userInfo.getStatusId();
 		UserStatus userStatus = userStatusService.findOne(statusId);

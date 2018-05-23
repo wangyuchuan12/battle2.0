@@ -40,6 +40,10 @@ public class BattleCreateDetail {
 	private Integer scrollGogal;
 	
 	@ParamAnnotation
+	@Column(name="process_gogal")
+	private Integer processGogal;
+	
+	@ParamAnnotation
 	@Column
 	private Integer places;
 	
@@ -125,6 +129,14 @@ public class BattleCreateDetail {
 
 	public void setLoveCount(Integer loveCount) {
 		this.loveCount = loveCount;
+	}
+
+	public Integer getProcessGogal() {
+		return processGogal;
+	}
+
+	public void setProcessGogal(Integer processGogal) {
+		this.processGogal = processGogal;
 	}
 
 	public DateTime getCreateAt() {

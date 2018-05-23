@@ -15,6 +15,9 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author xiaojf 2017/3/2 9:55.
@@ -28,6 +31,9 @@ public class SocketHandler extends TextWebSocketHandler {
     
     @Autowired
     private OnlineListener onlineListener;
+    
+    @Autowired
+    private ScheduledExecutorService executorService;
     
     final static Logger logger = LoggerFactory.getLogger(SocketHandler.class);
     @Override
@@ -50,13 +56,12 @@ public class SocketHandler extends TextWebSocketHandler {
     	
     	sessionMap.remove(token.toString());
     	
-    	
-    	Timer timer = new Timer();
-    	
-    	TimerTask timerTask = new TimerTask() {
+    	Thread timerTask = new Thread() {
 			
 			@Override
 			public void run() {
+				
+				System.out.println("...............尊贵和荣耀");
 				logger.debug("put session delay 1000 run");
 				sessionMap.put(token.toString(),session);
 				onlineListener.onLine(userId.toString());
@@ -69,7 +74,7 @@ public class SocketHandler extends TextWebSocketHandler {
 			}
 		};
 		
-		timer.schedule(timerTask, 100);
+		executorService.schedule(timerTask, 100,TimeUnit.MILLISECONDS);
     	
 		/*
     	sessionMap.put(token.toString(),session);
@@ -87,18 +92,17 @@ public class SocketHandler extends TextWebSocketHandler {
     	Object token = attributes.get("token");
     	final Object userId = attributes.get("userId");
     	
-    	
-    	Timer timer = new Timer();
-    	
     	TimerTask timerTask = new TimerTask() {
 			
 			@Override
 			public void run() {
+				
+				System.out.println("...............尊贵和荣耀2");
 				onlineListener.downLine(userId.toString());
 			}
 		};
 		
-		timer.schedule(timerTask,500);
+		executorService.schedule(timerTask,500,TimeUnit.MILLISECONDS);
     	
 		/*
     	onlineListener.downLine(userId.toString());
@@ -130,9 +134,13 @@ public class SocketHandler extends TextWebSocketHandler {
      * @author xiaojf 2017/3/2 11:43
      */
     public void sendMessage(Collection<String> acceptorList, Collection<String> msgList) throws IOException {
+    	
+    	System.out.println(".......acceptorlist:"+acceptorList+",msgList:"+msgList);
         if (acceptorList != null && msgList != null) {
             for (String acceptor : acceptorList) {
                 WebSocketSession session = sessionMap.get(acceptor);
+                
+                System.out.println("..........session:"+session);
                 if (session != null) {
                     for (String msg : msgList) {
                         session.sendMessage(new TextMessage(msg.getBytes()));

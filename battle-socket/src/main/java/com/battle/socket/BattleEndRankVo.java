@@ -15,6 +15,12 @@ public class BattleEndRankVo {
 	private Integer score;
 	
 	private Integer process;
+	
+	private Integer places;
+	
+	private Integer rewardBean;
+	
+	private Integer rewardLove;
 
 	public Integer getRank() {
 		return rank;
@@ -70,5 +76,29 @@ public class BattleEndRankVo {
 
 	public void setProcess(Integer process) {
 		this.process = process;
+	}
+
+	public Integer getPlaces() {
+		return places;
+	}
+
+	public void setPlaces(Integer places) {
+		this.places = places;
+	}
+
+	public Integer getRewardBean() {
+		return rewardBean;
+	}
+
+	public void setRewardBean(Integer rewardBean) {
+		this.rewardBean = rewardBean;
+	}
+
+	public Integer getRewardLove() {
+		return rewardLove;
+	}
+
+	public void setRewardLove(Integer rewardLove) {
+		this.rewardLove = rewardLove;
 	}
 }

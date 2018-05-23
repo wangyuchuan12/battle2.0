@@ -224,6 +224,11 @@ public class BattleRoom implements Serializable{
 	@Column(name="scroll_gogal")
 	private Integer scrollGogal;
 	
+	
+	@ParamAnnotation
+	@Column(name="process_gogal")
+	private Integer processGogal;
+	
 	//结束方式
 	@ParamAnnotation
 	@Column(name="end_type")
@@ -285,6 +290,10 @@ public class BattleRoom implements Serializable{
 	@ParamAnnotation
 	@Column(name="is_start")
 	private Integer isStart;
+	
+	@ParamAnnotation
+	@Column(name="current_stage_index")
+	private Integer currentStageIndex;
 	
 	@ParamAnnotation
 	@Column(name="start_time")
@@ -783,6 +792,22 @@ public class BattleRoom implements Serializable{
 
 	public void setIsStart(Integer isStart) {
 		this.isStart = isStart;
+	}
+
+	public Integer getCurrentStageIndex() {
+		return currentStageIndex;
+	}
+
+	public void setCurrentStageIndex(Integer currentStageIndex) {
+		this.currentStageIndex = currentStageIndex;
+	}
+
+	public Integer getProcessGogal() {
+		return processGogal;
+	}
+
+	public void setProcessGogal(Integer processGogal) {
+		this.processGogal = processGogal;
 	}
 
 	public DateTime getCreateAt() {

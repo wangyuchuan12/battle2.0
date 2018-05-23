@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.battle.dao.BattleSubjectDao;
@@ -50,5 +51,10 @@ public class BattleSubjectService {
 	public List<String> getIdsByBattleId(String battleId) {
 		
 		return battleSubjectDao.getIdsByBattleId(battleId);
+	}
+
+	public List<BattleSubject> findAllByBattleIdAndIsDel(String battleId, int isDel, Pageable pageable) {
+		
+		return battleSubjectDao.findAllByBattleIdAndIsDel(battleId,isDel,pageable);
 	}
 }

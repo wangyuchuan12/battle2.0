@@ -48,11 +48,15 @@ public class BattleMembersApiFilter extends Filter{
 		statuses.add(BattlePeriodMember.STATUS_OUT);
 		List<BattlePeriodMember> members = new ArrayList<>();
 		
+		
+		System.out.println("........battleId:"+battleId+",roomId:"+roomId);
 		if(!CommonUtil.isEmpty(groupId)){
 			members = battlePeriodMemberService.findAllByBattleIdAndPeriodIdAndRoomIdAndStatusInAndGroupIdAndIsDel(battleId, periodId, roomId, statuses, groupId, 0, pageable);
 		}else{
 			members = battlePeriodMemberService.findAllByBattleIdAndPeriodIdAndRoomIdAndStatusInAndIsDel(battleId,periodId,roomId,statuses,0,pageable);
 		}
+		
+		System.out.println("..........members:"+members);
 				
 				
 		

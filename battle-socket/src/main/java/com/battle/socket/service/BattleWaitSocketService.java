@@ -1,8 +1,9 @@
 package com.battle.socket.service;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +26,12 @@ public class BattleWaitSocketService {
 	@Autowired
 	private BattleWaitUserService battleWaitUserService;
 	
+	@Autowired
+    private ScheduledExecutorService executorService;
+	
 	
 	public void waitEndPublish(final BattleRoom battleRoom,final String waitId)throws Exception{
-		Timer timer = new Timer();		
-		timer.schedule(new TimerTask() {
+		executorService.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				try{
@@ -50,17 +53,20 @@ public class BattleWaitSocketService {
 					logger.error("{}",e);
 				}
 			}
-		},1000);
+		},1,TimeUnit.SECONDS);
 	}
 	
 	public void waitPublish(final BattleWaitUser user)throws Exception{
-
-		Timer timer = new Timer();		
-		timer.schedule(new TimerTask() {
+	
+		
+		System.out.println("........waitPublish");
+		executorService.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				try{
 					List<BattleWaitUser> battleWaitUsers = battleWaitUserService.findAllByWaitId(user.getWaitId());
+					
+					System.out.println(".............battleWaitUsers:"+battleWaitUsers);
 					List<String> userIds = new ArrayList<>();
 					for(BattleWaitUser battleWaitUser:battleWaitUsers){
 						String userId = battleWaitUser.getUserId();
@@ -68,6 +74,8 @@ public class BattleWaitSocketService {
 							userIds.add(userId);
 						}
 					}
+					
+					System.out.println(".............userIds:"+userIds);
 					
 					final MessageVo messageVo = new MessageVo();
 					messageVo.setData(user);
@@ -79,7 +87,7 @@ public class BattleWaitSocketService {
 					logger.error("{}",e);
 				}
 			}
-		},1000);
+		},1,TimeUnit.SECONDS);
 		
 	}
 	

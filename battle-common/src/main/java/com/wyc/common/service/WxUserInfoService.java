@@ -42,4 +42,8 @@ public class WxUserInfoService {
 		
 		return userInfoRepository.findOne(id);
 	}
+
+	public UserInfo findOneBySignature(String signature) {
+		return userInfoRepository.findOneBySignature(signature);
+	}
 }

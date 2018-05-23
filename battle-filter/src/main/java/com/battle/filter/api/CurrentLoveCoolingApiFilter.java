@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import com.battle.domain.BattleMemberLoveCooling;
-import com.battle.domain.BattlePeriod;
 import com.battle.domain.BattlePeriodMember;
 import com.battle.filter.element.CurrentLoveCoolingFilter;
 import com.battle.filter.element.CurrentMemberInfoFilter;

@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -67,13 +68,19 @@ public class InitRoomService {
 	@Autowired
 	private BattleDanService battleDanService;
 	
+	@Autowired
+	private ScheduledExecutorService executorService;
+	
 	final static Logger logger = LoggerFactory.getLogger(InitRoomService.class);
 	
 	public BattleRoom addRoom(BattleRoom battleRoom){
 		
+		
+		
 		battleRoomService.add(battleRoom);
 		
 		roomStartTask.run(battleRoom);
+
 		
 		return battleRoom;
 	}
@@ -112,49 +119,44 @@ public class InitRoomService {
 			battleRoom.setIsIncrease(0);
 			battleRoom.setStartTime(new DateTime());
 			battleRoom.setLoveCount(battleDan.getLoveCount());
+			battleRoom.setProcessGogal(battleDan.getProcessGogal());
 		}
 		addRoom(battleRoom);
+
+		List<BattleWaitUser> battleWaitUsers = battleWaitUserService.findAllByWaitIdAndStatus(waitId,BattleWaitUser.READY_STATUS);
+		List<Map<String, Object>> users = new ArrayList<>();
 		
-		System.out.println(".......................addRoom");
-		Timer timer = new Timer();
+		for(BattleWaitUser battleWaitUser:battleWaitUsers){
+			
+			Map<String, Object> user = new HashMap<>();
+			String danUserId = battleWaitUser.getDanUserId();
+			if(CommonUtil.isNotEmpty(danUserId)){
+				BattleDanUser battleDanUser = battleDanUserService.findOne(danUserId);
+				user.put("danId", battleDanUser.getDanId());
+				
+				battleDanUser.setRoomId(battleRoom.getId());
+				
+				battleDanUserService.update(battleDanUser);
+			}
+			
+			user.put("userId", battleWaitUser.getUserId());
+
+			users.add(user);
+		}
 		
-		timer.schedule(new TimerTask() {
+		
+		roomTakapertService.takepart(battleRoom, users);
+		
+		executorService.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				List<BattleWaitUser> battleWaitUsers = battleWaitUserService.findAllByWaitIdAndStatus(waitId,BattleWaitUser.READY_STATUS);
-				
-				System.out.println(".............battleWaitUsers:"+battleWaitUsers);
-				List<Map<String, Object>> users = new ArrayList<>();
-				
-				for(BattleWaitUser battleWaitUser:battleWaitUsers){
-					
-					Map<String, Object> user = new HashMap<>();
-					String danUserId = battleWaitUser.getDanUserId();
-					if(CommonUtil.isNotEmpty(danUserId)){
-						BattleDanUser battleDanUser = battleDanUserService.findOne(danUserId);
-						user.put("danId", battleDanUser.getDanId());
-						
-						battleDanUser.setRoomId(battleRoom.getId());
-						
-						battleDanUserService.update(battleDanUser);
-					}
-					
-					user.put("userId", battleWaitUser.getUserId());
-
-					users.add(user);
-				}
 				try{
 					battleWaitSocketService.waitEndPublish(battleRoom, waitId);
 				}catch(Exception e){
 					logger.error("{}",e);
 				}
-				
-				System.out.println(".............users:"+users);
-				
-				roomTakapertService.takepart(battleRoom, users);
-				
 			}
-		}, 4000);
+		}, 500,TimeUnit.MILLISECONDS);
 
 		return battleRoom;
 		
@@ -176,6 +178,7 @@ public class InitRoomService {
 		battleRoom.setIsIncrease(0);
 		battleRoom.setStartTime(new DateTime());
 		battleRoom.setLoveCount(battleCreateDetail.getLoveCount());
+		battleRoom.setProcessGogal(battleCreateDetail.getProcessGogal());
 		
 		addRoom(battleRoom);
 		

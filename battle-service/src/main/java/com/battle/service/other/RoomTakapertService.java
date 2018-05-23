@@ -78,6 +78,7 @@ public class RoomTakapertService {
 			battlePeriodMember.setScore(0);
 			battlePeriodMember.setScrollGogal(battleRoom.getScrollGogal());
 			battlePeriodMember.setStageCount(battlePeriod.getStageCount());
+			battlePeriodMember.setProcessGogal(battleRoom.getProcessGogal());
 			battlePeriodMember.setStageIndex(1);
 			battlePeriodMember.setStatus(BattlePeriodMember.STATUS_IN);
 			battlePeriodMember.setTakepartAt(new DateTime());

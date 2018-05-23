@@ -9,7 +9,7 @@ import com.battle.domain.BattleUser;
 
 public interface BattleUserDao extends CrudRepository<BattleUser, String>{
 
-	@QueryHints({@QueryHint(name ="org.hibernate.cacheable", value ="true") })
+	//@QueryHints({@QueryHint(name ="org.hibernate.cacheable", value ="true") })
 	BattleUser findOneByUserIdAndBattleId(String userId, String battleId);
 
 }

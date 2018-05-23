@@ -124,6 +124,10 @@ public class UserInfo implements Serializable{
     @ParamAnnotation(type=ParamEntityAnnotation.SESSION_TYPE)
     private String statusId;
     
+    @Column
+    @ParamAnnotation(type=ParamEntityAnnotation.SESSION_TYPE)
+    private String signature;
+    
     @Column(name = "create_at")
     @ParamAnnotation(type=ParamEntityAnnotation.SESSION_TYPE)
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
@@ -296,5 +300,11 @@ public class UserInfo implements Serializable{
 	}
 	public void setStatusId(String statusId) {
 		this.statusId = statusId;
+	}
+	public String getSignature() {
+		return signature;
+	}
+	public void setSignature(String signature) {
+		this.signature = signature;
 	}
 }

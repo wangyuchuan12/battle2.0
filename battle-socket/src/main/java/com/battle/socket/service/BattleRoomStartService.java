@@ -2,6 +2,7 @@ package com.battle.socket.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,12 @@ public class BattleRoomStartService {
 
 	@Autowired
 	private MessageHandler messageHandler;
+	
+	@Autowired
+    private ScheduledExecutorService executorService;
+	
 	public void startPublish(final BattleRoom battleRoom){
-		new Thread(){
+		Thread thread = new Thread(){
 			public void run() {
 				MessageVo messageVo = new MessageVo();
 				messageVo.setCode(MessageVo.ROOM_START_CODE);
@@ -34,6 +39,8 @@ public class BattleRoomStartService {
 					
 				}
 			}
-		}.start();
+		};
+		
+		executorService.submit(thread);
 	}
 }

@@ -74,6 +74,9 @@ public class BattlePeriodMember implements Serializable{
 	@Column
 	private Integer process;
 	
+	@ParamAnnotation
+	@Column(name="process_gogal")
+	private Integer processGogal;
 	
 	//爱心数量上限
 	@ParamAnnotation
@@ -389,6 +392,14 @@ public class BattlePeriodMember implements Serializable{
 
 	public void setRewardLove(Integer rewardLove) {
 		this.rewardLove = rewardLove;
+	}
+
+	public Integer getProcessGogal() {
+		return processGogal;
+	}
+
+	public void setProcessGogal(Integer processGogal) {
+		this.processGogal = processGogal;
 	}
 
 	public DateTime getCreateAt() {

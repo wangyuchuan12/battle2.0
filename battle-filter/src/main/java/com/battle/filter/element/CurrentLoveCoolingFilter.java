@@ -24,11 +24,9 @@ public class CurrentLoveCoolingFilter extends Filter{
 		}
 		
 		BattleMemberLoveCooling battleMemberLoveCooling = battleMemberLoveCoolingService.findOneByBattleMemberId(battlePeriodMember.getId());
-		
-		
-		
-		
+
 		if(battleMemberLoveCooling==null){
+			
 			Long millisec = 1000L;
 			Integer unit = 1;
 			Long upperLimit = 100L;
@@ -41,7 +39,6 @@ public class CurrentLoveCoolingFilter extends Filter{
 			battleMemberLoveCooling.setStatus(BattlePeriodMember.STATUS_FREE);
 			battleMemberLoveCoolingService.add(battleMemberLoveCooling);
 			
-			System.out.println("***********************************************");
 		}else{
 			
 		}

@@ -2,7 +2,9 @@ package com.battle.socket.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -11,9 +13,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.battle.domain.BattleMemberRank;
 import com.battle.domain.BattlePeriodMember;
 import com.battle.domain.BattleRoom;
+import com.battle.domain.BattleRoomReward;
+import com.battle.service.BattleMemberRankService;
 import com.battle.service.BattlePeriodMemberService;
+import com.battle.service.BattleRoomRewardService;
 import com.battle.service.BattleRoomService;
 import com.battle.socket.BattleEndRankVo;
 import com.battle.socket.MessageHandler;
@@ -29,6 +35,12 @@ public class BattleEndSocketService {
 	
 	@Autowired
 	private BattleRoomService battleRoomService;
+	
+	@Autowired
+	private BattleRoomRewardService battleRoomRewardService;
+	
+	@Autowired
+	private BattleMemberRankService battleMemberRankService;
 	public void endPublish(String roomId) throws IOException{
 		
 		Sort sort = new Sort(Direction.DESC,"score");
@@ -47,6 +59,20 @@ public class BattleEndSocketService {
 		
 		List<BattleEndRankVo> battleEndRankVos = new ArrayList<>();
 		
+		List<BattleRoomReward> battleRoomRewards = battleRoomRewardService.findAllByRoomIdOrderByRankAsc(roomId);
+		
+		List<BattleMemberRank> battleMemberRanks = battleMemberRankService.findAllByRoomId(roomId);
+		
+		Map<String, BattleRoomReward> battleRoomRewardMap = new HashMap<>();
+		Map<String, BattleMemberRank> battleMemberRankMap = new HashMap<>();
+		
+		for(BattleRoomReward battleRoomReward:battleRoomRewards){
+			battleRoomRewardMap.put(battleRoomReward.getReceiveMemberId(), battleRoomReward);
+		}
+		
+		for(BattleMemberRank battleMemberRank:battleMemberRanks){
+			battleMemberRankMap.put(battleMemberRank.getMemberId(), battleMemberRank);	
+		}
 		for(int i = 0;i<battlePeriodMembers.size();i++){
 			BattlePeriodMember battlePeriodMember = battlePeriodMembers.get(i);
 			BattleEndRankVo battleEndVo = new BattleEndRankVo();
@@ -57,6 +83,22 @@ public class BattleEndSocketService {
 			battleEndVo.setRank(i+1);
 			battleEndVo.setRoomId(battlePeriodMember.getRoomId());
 			battleEndVo.setScore(battlePeriodMember.getScore());
+			battleEndVo.setPlaces(battleRoom.getPlaces());
+			BattleRoomReward battleRoomReward = battleRoomRewardMap.get(battlePeriodMember.getId());
+			
+			BattleMemberRank battleMemberRank = battleMemberRankMap.get(battlePeriodMember.getId());
+			
+			if(battleMemberRank!=null){
+				battleEndVo.setRank(battleMemberRank.getRank());
+			}
+			
+			if(battleRoomReward!=null){
+				battleEndVo.setRewardBean(battleRoomReward.getRewardBean());
+				battleEndVo.setRewardLove(battleRoomReward.getRewardLove());
+			}else{
+				battleEndVo.setRewardBean(0);
+				battleEndVo.setRewardLove(0);
+			}
 			battleEndRankVos.add(battleEndVo);
 		}
 		messageVo.setData(battleEndRankVos);

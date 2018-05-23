@@ -47,7 +47,9 @@ public class BattleWaitApi {
 	public Object waitUsers(HttpServletRequest httpServletRequest)throws Exception{
 		
 		String waitId = httpServletRequest.getParameter("waitId");
-		List<BattleWaitUser> battleWaitUsers = battleWaitUserService.findAllByWaitIdAndStatus(waitId, BattleWaitUser.READY_STATUS);
+		
+		
+		List<BattleWaitUser> battleWaitUsers = battleWaitUserService.findAllByWaitId(waitId);
 		
 		
 		ResultVo resultVo = new ResultVo();
@@ -68,6 +70,9 @@ public class BattleWaitApi {
 		String danUserId = httpServletRequest.getParameter("danUserId");
 		BattleWaitUser battleWaitUser = battleWaitUserService.findOneByWaitIdAndUserId(waitId,userInfo.getId());
 		if(battleWaitUser==null){
+			
+
+			/*
 			BattleWait battleWait = battleWaitService.findOne(waitId);
 			Integer num = battleWait.getNum();
 			if(num==null){
@@ -80,10 +85,10 @@ public class BattleWaitApi {
 				battleWait.setStatus(BattleWait.START_STATUS);
 				initRoomService.addDanRoom(waitId);
 			}
-			battleWaitService.update(battleWait);
+			battleWaitService.update(battleWait);*/
 			
 			battleWaitUser = new BattleWaitUser();
-			battleWaitUser.setStatus(BattleWaitUser.READY_STATUS);
+			battleWaitUser.setStatus(BattleWaitUser.INTO_STATUS);
 			battleWaitUser.setUserId(userInfo.getId());
 			battleWaitUser.setWaitId(waitId);
 			battleWaitUser.setNickname(userInfo.getNickname());
@@ -95,6 +100,7 @@ public class BattleWaitApi {
 			battleWaitSocketService.waitPublish(battleWaitUser);
 		}else{
 			
+			/*
 			BattleWait battleWait = battleWaitService.findOne(waitId);
 			Integer num = battleWait.getNum();
 			if(num==null){
@@ -102,9 +108,14 @@ public class BattleWaitApi {
 			}
 			num++;
 			battleWait.setNum(num);
-			battleWaitUser.setStatus(BattleWaitUser.READY_STATUS);
 			battleWaitService.update(battleWait);
-			battleWaitUserService.update(battleWaitUser);
+			
+			*/
+			
+			if(battleWaitUser.getStatus().intValue()!=BattleWaitUser.READY_STATUS){
+				battleWaitUser.setStatus(BattleWaitUser.INTO_STATUS);
+				battleWaitUserService.update(battleWaitUser);
+			}
 			battleWaitSocketService.waitPublish(battleWaitUser);
 		}
 		
@@ -132,6 +143,23 @@ public class BattleWaitApi {
 		battleWaitUserService.update(battleWaitUser);
 		
 		battleWaitSocketService.waitPublish(battleWaitUser);
+		
+		BattleWait battleWait = battleWaitService.findOne(waitId);
+		Integer num = battleWait.getNum();
+		if(num==null){
+			num = 0;
+		}
+		num++;
+		battleWait.setNum(num);
+		
+		battleWaitService.update(battleWait);
+		if(num>=battleWait.getMininum()&&battleWait.getIsPrepareStart()==0){
+			battleWait.setIsPrepareStart(1);
+			battleWait.setStatus(BattleWait.START_STATUS);
+			battleWaitService.update(battleWait);
+			initRoomService.addDanRoom(waitId);
+		}
+		
 		ResultVo resultVo = new ResultVo();
 		resultVo.setSuccess(true);
 		resultVo.setData(battleWaitUser);

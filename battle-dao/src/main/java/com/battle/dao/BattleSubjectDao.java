@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.QueryHint;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.CrudRepository;
@@ -22,5 +23,8 @@ public interface BattleSubjectDao extends CrudRepository<BattleSubject, String>{
 	@QueryHints({@QueryHint(name ="org.hibernate.cacheable", value ="true") })
 	@Query("select id from com.battle.domain.BattleSubject bs where bs.battleId=:battleId")
 	List<String> getIdsByBattleId(@Param("battleId")String battleId);
+
+	@Query("from com.battle.domain.BattleSubject bs where bs.battleId=:battleId and bs.isDel=:isDel order by rand()")
+	List<BattleSubject> findAllByBattleIdAndIsDel(@Param("battleId")String battleId,@Param("isDel") int isDel, Pageable pageable);
 
 }

@@ -14,10 +14,9 @@ import com.battle.domain.BattleMemberRank;
 import com.battle.domain.BattlePeriodMember;
 import com.battle.domain.BattleRoom;
 import com.battle.domain.BattleUser;
-import com.battle.filter.element.CurrentBattlePeriodMemberFilter;
-import com.battle.filter.element.CurrentBattleUserFilter;
-import com.battle.filter.element.LoginStatusFilter;
+import com.battle.filter.element.CurrentBattleStageRestMemberFilter;
 import com.battle.service.BattleMemberRankService;
+import com.battle.service.BattleRoomService;
 import com.wyc.AttrEnum;
 import com.wyc.common.domain.vo.ResultVo;
 import com.wyc.common.filter.Filter;
@@ -27,12 +26,15 @@ public class BattleMemberInfoApiFilter extends Filter{
 	
 	@Autowired
 	private BattleMemberRankService battleMemberRankService;
+	
+	@Autowired
+	private BattleRoomService battleRoomService;
 	@Override
 	public Object handlerFilter(SessionManager sessionManager) throws Exception {
 		BattlePeriodMember battlePeriodMember = sessionManager.getObject(BattlePeriodMember.class);
 		BattleUser battleUser = sessionManager.getObject(BattleUser.class);
 		
-		BattleRoom battleRoom = sessionManager.findOne(BattleRoom.class, battlePeriodMember.getRoomId());
+		BattleRoom battleRoom = battleRoomService.findOne(battlePeriodMember.getRoomId());
 		
 		Map<String, Object> data = new HashMap<>();
 		data.put("battleId", battlePeriodMember.getBattleId());
@@ -75,6 +77,8 @@ public class BattleMemberInfoApiFilter extends Filter{
 		data.put("mininum", battleRoom.getMininum());
 		
 		data.put("shareTime", battlePeriodMember.getShareTime());
+		
+		data.put("processGogal", battlePeriodMember.getProcessGogal());
 		
 		data.put("roomStatus", battleRoom.getStatus());
 		
@@ -137,10 +141,11 @@ public class BattleMemberInfoApiFilter extends Filter{
 	@Override
 	public List<Class<? extends Filter>> dependClasses() {
 		List<Class<? extends Filter>> classes = new ArrayList<>();
-		classes.add(LoginStatusFilter.class);
-		classes.add(CurrentBattleUserFilter.class);
-		classes.add(CurrentBattlePeriodMemberFilter.class);
-		//classes.add(CurrentLoveCoolingFilter.class);
+//		classes.add(LoginStatusFilter.class);
+//		classes.add(CurrentBattleUserFilter.class);
+//		classes.add(CurrentBattlePeriodMemberFilter.class);
+//		classes.add(CurrentLoveCoolingFilter.class);
+		classes.add(CurrentBattleStageRestMemberFilter.class);
 		return classes;
 	}
 
