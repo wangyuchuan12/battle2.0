@@ -12,10 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -23,8 +19,6 @@ import com.battle.domain.BattleAccountResult;
 import com.battle.domain.BattleMemberLoveCooling;
 import com.battle.domain.BattleMemberPaperAnswer;
 import com.battle.domain.BattleMemberQuestionAnswer;
-import com.battle.domain.BattleNotice;
-import com.battle.domain.BattlePeriod;
 import com.battle.domain.BattlePeriodMember;
 import com.battle.domain.BattlePeriodStage;
 import com.battle.domain.BattleQuestion;
@@ -39,7 +33,6 @@ import com.battle.filter.element.CurrentMemberInfoFilter;
 import com.battle.service.BattleMemberLoveCoolingService;
 import com.battle.service.BattleMemberPaperAnswerService;
 import com.battle.service.BattleMemberQuestionAnswerService;
-import com.battle.service.BattleNoticeService;
 import com.battle.service.BattlePeriodMemberService;
 //import com.battle.service.BattlePeriodService;
 import com.battle.service.BattlePeriodStageService;
@@ -51,7 +44,6 @@ import com.battle.service.QuestionAnswerService;
 import com.battle.service.QuestionOptionService;
 import com.battle.service.QuestionService;
 import com.battle.service.other.AccountResultHandleService;
-import com.battle.service.other.BattleStageRestHandleService;
 import com.battle.socket.service.ProgressStatusSocketService;
 import com.wyc.annotation.HandlerAnnotation;
 import com.wyc.common.domain.Account;
@@ -514,7 +506,7 @@ public class QuestionApi {
 		sessionManager.update(questionAnswer);
 		sessionManager.update(battleMemberPaperAnswer);
 	
-		progressStatusSocketService.statusPublish(battlePeriodMember.getRoomId(), battlePeriodMember,battlePeriodMember.getUserId());
+		progressStatusSocketService.statusPublish(battlePeriodMember.getRoomId(),battlePeriodMember,battleMemberPaperAnswer);
 		
 		return resultVo;
 	}

@@ -85,7 +85,7 @@ public class OnlineListener {
 		userStatus.setIsLine(1);
 		userStatus.setOnLineAt(new DateTime());
 		
-		List<BattleStageRestMember> battleStageRestMembers = battleStageRestMemberService.findAllByUserId(userInfo.getId());
+		/*List<BattleStageRestMember> battleStageRestMembers = battleStageRestMemberService.findAllByUserId(userInfo.getId());
 		if(battleStageRestMembers!=null&&battleStageRestMembers.size()>0){
 			for(BattleStageRestMember battleStageRestMember:battleStageRestMembers){
 				battleStageRestMember.setIsOnline(1);
@@ -96,7 +96,7 @@ public class OnlineListener {
 					logger.error("{}",e);
 				}
 			}
-		}
+		}*/
 		
 		userStatusService.update(userStatus);
 		platformTransactionManager.commit(transactionStatus);
@@ -126,7 +126,7 @@ public class OnlineListener {
     	TransactionStatus transactionStatus = platformTransactionManager.getTransaction(def);
 		UserInfo userInfo = userInfoService.findOne(id);
 		
-		List<BattleStageRestMember> battleStageRestMembers = battleStageRestMemberService.findAllByUserId(userInfo.getId());
+		List<BattleStageRestMember> battleStageRestMembers = battleStageRestMemberService.findAllByUserIdAndIsOnline(userInfo.getId(),1);
 		
 		if(battleStageRestMembers!=null&&battleStageRestMembers.size()>0){
 			for(BattleStageRestMember battleStageRestMember:battleStageRestMembers){

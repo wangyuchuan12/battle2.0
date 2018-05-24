@@ -226,11 +226,13 @@ public class WxPayApi{
 			ResultVo resultVo = new ResultVo();
 			resultVo.setSuccess(false);
 			resultVo.setMsg("智慧豆不足");
+			return resultVo;
 		}
 		if(love<costLoveInt){
 			ResultVo resultVo = new ResultVo();
 			resultVo.setSuccess(false);
 			resultVo.setMsg("爱心不足");
+			return resultVo;
 		}
 		
 		bean = bean-costBeanInt;

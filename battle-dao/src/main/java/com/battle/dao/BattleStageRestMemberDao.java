@@ -15,4 +15,6 @@ public interface BattleStageRestMemberDao extends CrudRepository<BattleStageRest
 
 	List<BattleStageRestMember> findAllByUserId(String userId);
 
+	List<BattleStageRestMember> findAllByUserIdAndIsOnline(String userId, int i);
+
 }

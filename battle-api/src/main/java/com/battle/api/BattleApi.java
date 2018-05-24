@@ -1134,13 +1134,9 @@ public class BattleApi {
 		battlePeriodMember.setStatus(BattlePeriodMember.STATUS_OUT);
 		
 		battlePeriodMemberService.update(battlePeriodMember);
-	
-		
-		System.out.println(".......................roomSignOut");
 		
 		progressStatusSocketService.statusPublish(battlePeriodMember.getRoomId(),battlePeriodMember.getUserId());
-		
-		
+
 		ResultVo resultVo = new ResultVo();
 		
 		resultVo.setSuccess(true);

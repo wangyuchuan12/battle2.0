@@ -910,6 +910,14 @@ public class BattleDanApi {
 		List<Map<String, Object>> list = new ArrayList<>();
 		
 		BattleAccountResult battleAccountResult = sessionManager.getObject(BattleAccountResult.class);
+		
+		List<BattleDanUser> battleDanUsers = battleDanUserService.findAllByUserIdAndPointIdOrderByLevelAsc(userInfo.getId(), battleDanPoint.getId());
+		Map<String, BattleDanUser> battleDanUserMap = new HashMap<>();
+		
+		for(BattleDanUser battleDanUser:battleDanUsers){
+			battleDanUserMap.put(battleDanUser.getDanId(), battleDanUser);
+		}
+		
 		for(BattleDan battleDan:battleDans){
 			Map<String, Object> map = new HashMap<>();
 			map.put("id", battleDan.getId());
@@ -938,17 +946,7 @@ public class BattleDanApi {
 				map.put("status", BattleDan.STATUS_FREE);
 			}
 			
-			List<BattleDanUser> battleDanUsers = battleDanUserService.findAllByDanIdAndUserId(battleDan.getId(), userInfo.getId());
-			
-			BattleDanUser battleDanUser = null;
-			if(battleDanUsers.size()>0){
-				battleDanUser = battleDanUsers.get(0);
-				if(battleDanUsers.size()>1){
-					BattleDanUser battleDanUser2 = battleDanUsers.get(1);
-					battleDanUser2.setIsDel(1);
-					battleDanUserService.update(battleDanUser2);
-				}
-			}
+			BattleDanUser battleDanUser = battleDanUserMap.get(battleDan.getId());
 			
 			if(battleDanUser==null){
 				map.put("costBean", battleDan.getSign1BeanCost());

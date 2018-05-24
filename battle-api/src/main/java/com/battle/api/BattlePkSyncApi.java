@@ -180,7 +180,7 @@ public class BattlePkSyncApi {
 				try{
 					battleEndSocketService.endPublish(oldBattleRoom.getId());
 					pkSocketService.statusPublish(battlePk);
-					progressStatusSocketService.statusPublish(oldBattleRoom.getId(), battlePeriodMember, battlePeriodMember.getUserId());
+					//progressStatusSocketService.statusPublish(oldBattleRoom.getId(), battlePeriodMember, battlePeriodMember.getUserId());
 				}catch(Exception e){
 					logger.error("{}",e);
 				}

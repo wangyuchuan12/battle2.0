@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.battle.domain.BattleMemberPaperAnswer;
 import com.battle.domain.BattlePeriodMember;
 import com.battle.domain.BattleRoom;
 import com.battle.service.BattlePeriodMemberService;
@@ -30,7 +32,7 @@ public class ProgressStatusSocketService {
 	
 	@Autowired
 	private ScheduledExecutorService executorService;
-	public void statusPublish(final String roomId,final BattlePeriodMember battlePeriodMember,final String ...excludeIds){
+	public void statusPublish(final String roomId,final BattlePeriodMember battlePeriodMember,final BattleMemberPaperAnswer battleMemberPaperAnswer){
 		
 		Thread thread = new Thread(){
 			public void run() {
@@ -40,15 +42,14 @@ public class ProgressStatusSocketService {
 				
 				ProgressStatusVo progressStatusVo = new ProgressStatusVo();
 				progressStatusVo.setLoveCount(battlePeriodMember.getLoveResidule());
-				progressStatusVo.setMemberId(battlePeriodMember.getId());
+				progressStatusVo.setMemberId(battleMemberPaperAnswer.getBattlePeriodMemberId());
 				progressStatusVo.setProcess(battlePeriodMember.getProcess());
 				progressStatusVo.setScore(battlePeriodMember.getScore());
 				progressStatusVo.setStatus(battlePeriodMember.getStatus());
-				
+				progressStatusVo.setThisProcess(battleMemberPaperAnswer.getProcess());
 				progressStatusVo.setRoomStatus(battleroom.getStatus());
-				
+				progressStatusVo.setStageIndex(battlePeriodMember.getStageIndex());
 				progressStatusVos.add(progressStatusVo);
-				
 				MessageVo messageVo = new MessageVo();
 				
 				messageVo.setCode(MessageVo.PROGRESS_CODE);
@@ -66,7 +67,7 @@ public class ProgressStatusSocketService {
 			}
 		};
 		
-		executorService.submit(thread);
+		executorService.schedule(thread, 500,TimeUnit.MILLISECONDS);
 	
 	}
 	

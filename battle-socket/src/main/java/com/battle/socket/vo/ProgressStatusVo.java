@@ -14,6 +14,10 @@ public class ProgressStatusVo {
 	
 	private Integer roomStatus;
 	
+	private Integer thisProcess;
+	
+	private Integer stageIndex;
+	
 	public Integer getRoomStatus() {
 		return roomStatus;
 	}
@@ -60,5 +64,21 @@ public class ProgressStatusVo {
 
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+
+	public Integer getThisProcess() {
+		return thisProcess;
+	}
+
+	public void setThisProcess(Integer thisProcess) {
+		this.thisProcess = thisProcess;
+	}
+
+	public Integer getStageIndex() {
+		return stageIndex;
+	}
+
+	public void setStageIndex(Integer stageIndex) {
+		this.stageIndex = stageIndex;
 	}
 }

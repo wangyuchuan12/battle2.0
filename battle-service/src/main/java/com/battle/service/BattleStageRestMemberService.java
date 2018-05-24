@@ -49,4 +49,8 @@ public class BattleStageRestMemberService {
 		
 		return battleStageRestMemberDao.findAllByUserId(userId);
 	}
+	
+	public List<BattleStageRestMember> findAllByUserIdAndIsOnline(String userId,Integer isOnline){
+		return battleStageRestMemberDao.findAllByUserIdAndIsOnline(userId,1);
+	}
 }
