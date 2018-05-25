@@ -17,19 +17,22 @@ public interface BattleQuestionDao extends CrudRepository<BattleQuestion, String
 	@Query("from com.battle.domain.BattleQuestion bq where bq.battleId=:battleId and bq.periodStageId=:periodStageId order by rand()")
 	List<BattleQuestion> findAllByBattleIdAndPeriodStageIdRandom(@Param("battleId")String battleId,@Param("periodStageId")String periodStageId,Pageable pageable);
 
-	
 	@Query("from com.battle.domain.BattleQuestion bq where bq.battleId=:battleId and bq.battleSubjectId=:battleSubjectId order by rand()")
 	List<BattleQuestion> findAllByBattleIdAndBattleSubjectIdRandom(@Param("battleId")String battleId,@Param("battleSubjectId") String subjectId,Pageable pageable);
 	
 	List<BattleQuestion> findAllByIdIn(List<String> ids);
 
+	@QueryHints({@QueryHint(name ="org.hibernate.cacheable", value ="true") })
 	List<BattleQuestion> findAllByPeriodStageIdAndBattleSubjectIdAndIsDelOrderBySeqAsc(String stageId, String subjectId,Integer isDel);
 
+	@QueryHints({@QueryHint(name ="org.hibernate.cacheable", value ="true") })
 	List<BattleQuestion> findAllByPeriodStageIdAndIsDelOrderBySeqAsc(String stageId,Integer isDel);
 
+	@QueryHints({@QueryHint(name ="org.hibernate.cacheable", value ="true") })
 	List<BattleQuestion> findAllByBattleIdAndPeriodStageIdAndBattleSubjectIdInAndIsDel(String battleId, String stageId,
 			String[] subjectIds,Integer isDel);
 
+	@QueryHints({@QueryHint(name ="org.hibernate.cacheable", value ="true") })
 	List<BattleQuestion> findAllByBattleIdAndBattlePeriodIdAndIsDel(String battleId, String periodId, int isDel);
 
 	
