@@ -52,7 +52,6 @@ import com.battle.service.BattleService;
 import com.battle.service.BattleUserService;
 import com.battle.service.BattleWaitService;
 import com.battle.service.other.BattleRoomHandleService;
-import com.battle.socket.service.InitRoomService;
 import com.wyc.AttrEnum;
 import com.wyc.annotation.HandlerAnnotation;
 import com.wyc.common.domain.Account;
@@ -62,6 +61,7 @@ import com.wyc.common.service.WxUserInfoService;
 import com.wyc.common.session.SessionManager;
 import com.wyc.common.util.CommonUtil;
 import com.wyc.common.wx.domain.UserInfo;
+import com.wyc.handle.InitRoomService;
 
 @Controller
 @RequestMapping(value="/api/battle/dan")

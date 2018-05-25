@@ -1,4 +1,4 @@
-package com.battle.socket.service;
+package com.wyc.handle;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +29,7 @@ import com.battle.service.BattleWaitService;
 import com.battle.service.BattleWaitUserService;
 import com.battle.service.other.BattleRoomHandleService;
 import com.battle.service.other.RoomTakapertService;
+import com.battle.socket.service.BattleWaitSocketService;
 import com.battle.socket.task.RoomStartTask;
 import com.wyc.common.util.CommonUtil;
 
@@ -147,16 +148,7 @@ public class InitRoomService {
 		
 		roomTakapertService.takepart(battleRoom, users);
 		
-		executorService.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				try{
-					battleWaitSocketService.waitEndPublish(battleRoom, waitId);
-				}catch(Exception e){
-					logger.error("{}",e);
-				}
-			}
-		}, 500,TimeUnit.MILLISECONDS);
+		battleWaitSocketService.waitEndPublish(battleRoom, waitId);
 
 		return battleRoom;
 		

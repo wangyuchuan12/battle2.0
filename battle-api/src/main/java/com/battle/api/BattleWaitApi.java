@@ -17,12 +17,12 @@ import com.battle.filter.element.LoginStatusFilter;
 import com.battle.service.BattleWaitService;
 import com.battle.service.BattleWaitUserService;
 import com.battle.socket.service.BattleWaitSocketService;
-import com.battle.socket.service.InitRoomService;
 import com.wyc.annotation.HandlerAnnotation;
 import com.wyc.common.domain.vo.ResultVo;
 import com.wyc.common.session.SessionManager;
 import com.wyc.common.util.CommonUtil;
 import com.wyc.common.wx.domain.UserInfo;
+import com.wyc.handle.InitRoomService;
 
 
 @Controller

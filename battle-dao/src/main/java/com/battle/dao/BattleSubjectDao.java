@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.persistence.QueryHint;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
@@ -26,5 +27,8 @@ public interface BattleSubjectDao extends CrudRepository<BattleSubject, String>{
 
 	@Query("from com.battle.domain.BattleSubject bs where bs.battleId=:battleId and bs.isDel=:isDel order by rand()")
 	List<BattleSubject> findAllByBattleIdAndIsDel(@Param("battleId")String battleId,@Param("isDel") int isDel, Pageable pageable);
+	
+	@Cacheable(value="userCache")
+	BattleSubject findOne(String id);
 
 }

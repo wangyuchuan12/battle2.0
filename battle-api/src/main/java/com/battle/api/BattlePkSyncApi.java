@@ -26,7 +26,6 @@ import com.battle.service.BattlePeriodMemberService;
 import com.battle.service.BattlePkService;
 import com.battle.service.BattleRoomService;
 import com.battle.socket.service.BattleEndSocketService;
-import com.battle.socket.service.InitRoomService;
 import com.battle.socket.service.PkSocketService;
 import com.battle.socket.service.ProgressStatusSocketService;
 import com.wyc.annotation.HandlerAnnotation;
@@ -34,6 +33,7 @@ import com.wyc.common.domain.vo.ResultVo;
 import com.wyc.common.session.SessionManager;
 import com.wyc.common.util.CommonUtil;
 import com.wyc.common.wx.domain.UserInfo;
+import com.wyc.handle.InitRoomService;
 
 @Controller
 @RequestMapping(value="/api/battleSyncPk/")
@@ -155,13 +155,28 @@ public class BattlePkSyncApi {
 		battlePk.setRoomStatus(BattlePk.ROOM_STATUS_FREE);
 		
 		
-		final BattleRoom oldBattleRoom = battleRoomService.findOne(battlePk.getRoomId());
+		BattleRoom oldBattleRoom = null;
 		
-		oldBattleRoom.setStatus(BattleRoom.STATUS_END);
+		if(CommonUtil.isNotEmpty(battlePk.getRoomId())){
+			oldBattleRoom = battleRoomService.findOne(battlePk.getRoomId());
+		}
 		
-		oldBattleRoom.setEndType(BattleRoom.FORCE_END_TYPE);
 		
-		battleRoomService.update(oldBattleRoom);
+		if(oldBattleRoom!=null){
+			oldBattleRoom.setStatus(BattleRoom.STATUS_END);
+			
+			oldBattleRoom.setEndType(BattleRoom.FORCE_END_TYPE);
+			
+			battleRoomService.update(oldBattleRoom);
+			
+			final BattlePeriodMember battlePeriodMember = battlePeriodMemberService.findOneByRoomIdAndUserIdAndIsDel(oldBattleRoom.getId(), userInfo.getId(), 0);
+			battlePeriodMember.setLoveResidule(0);
+			
+			battlePeriodMemberService.update(battlePeriodMember);
+			
+			battleEndSocketService.endPublish(oldBattleRoom.getId());
+			
+		}
 		
 		battlePk.setRoomId("");
 		battlePk.setBattleId("");
@@ -170,23 +185,7 @@ public class BattlePkSyncApi {
 		
 		battlePkService.update(battlePk);
 		
-		final BattlePeriodMember battlePeriodMember = battlePeriodMemberService.findOneByRoomIdAndUserIdAndIsDel(oldBattleRoom.getId(), userInfo.getId(), 0);
-		battlePeriodMember.setLoveResidule(0);
-		
-		battlePeriodMemberService.update(battlePeriodMember);
-		
-		new Thread(){
-			public void run() {
-				try{
-					battleEndSocketService.endPublish(oldBattleRoom.getId());
-					pkSocketService.statusPublish(battlePk);
-					//progressStatusSocketService.statusPublish(oldBattleRoom.getId(), battlePeriodMember, battlePeriodMember.getUserId());
-				}catch(Exception e){
-					logger.error("{}",e);
-				}
-			}
-		}.start();
-		
+		pkSocketService.statusPublish(battlePk);
 
 		ResultVo resultVo = new ResultVo();
 		

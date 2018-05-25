@@ -99,11 +99,9 @@ dependencies{
 	
 	compile project(':battle-models');
 	
-	compile project(':battle-service');
-	
 	compile project(':battle-filter');
 	
-	compile project(':battle-socket');
+	compile project(':battle-handle');
 	
 }
 
