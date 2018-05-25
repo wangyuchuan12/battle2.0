@@ -1,10 +1,14 @@
 package com.battle.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
@@ -16,7 +20,8 @@ import com.wyc.annotation.ParamEntityAnnotation;
 @ParamEntityAnnotation
 @Entity
 @Table(name="battle_wait_user")
-public class BattleWaitUser {
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class BattleWaitUser implements Serializable{
 	
 	public static final Integer FREE_STATUS = 0;
 	public static final Integer INTO_STATUS = 1;

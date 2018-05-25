@@ -1,10 +1,14 @@
 package com.battle.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 
@@ -16,8 +20,13 @@ import com.wyc.annotation.ParamEntityAnnotation;
 @ParamEntityAnnotation
 @Entity
 @Table(name="context")
-public class Context {
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class Context implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	//question表的index节点的最大值，每次添加一条数据就增加1，
 	public final static String QUESTION_MAX_INDEX_CODE="question_max_index";
 	@Id
