@@ -95,7 +95,7 @@ public class CurrentBattlePeriodMemberFilter extends Filter{
 			battlePeriodMember.setProcess(0);
 			battlePeriodMember.setNickname(nickname);
 			battlePeriodMember.setHeadImg(imgUrl);
-			battlePeriodMember.setStatus(BattlePeriodMember.STATUS_FREE);
+			battlePeriodMember.setStatus(BattlePeriodMember.STATUS_IN);
 			battlePeriodMember.setLoveCount(loveCount);
 			battlePeriodMember.setLoveResidule(loveCount);
 			battlePeriodMember.setStageIndex(1);
@@ -103,6 +103,8 @@ public class CurrentBattlePeriodMemberFilter extends Filter{
 			battlePeriodMember.setIsDel(0);
 			battlePeriodMember.setRoomId(roomId);
 			battlePeriodMember.setScore(0);
+			
+			battlePeriodMember.setProcessGogal(battleRoom.getProcessGogal());
 			
 			battlePeriodMember.setScrollGogal(battleRoom.getScrollGogal());
 			
