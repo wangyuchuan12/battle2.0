@@ -81,6 +81,7 @@ public class BattlePkHandleService {
 			
 		}
 		
+		
 		if(battlePk.getRoomStatus().intValue()==BattlePk.ROOM_STATUS_BATTLE){
 			BattleRoom battleRoom = battleRoomService.findOne(battlePk.getRoomId());
 			if(battleRoom.getStatus().intValue()==BattleRoom.STATUS_END){
@@ -148,6 +149,18 @@ public class BattlePkHandleService {
 			return homeInto(userInfo);
 		}
 		
+		if(CommonUtil.isNotEmpty(battlePk.getRoomId())){
+			BattleRoom battleRoom = battleRoomService.findOne(battlePk.getRoomId());
+			Integer status = battleRoom.getStatus();
+			if(status==BattleRoom.STATUS_END){
+				battlePk.setBeatStatus(BattlePk.STATUS_INSIDE);
+				battlePk.setHomeStatus(BattlePk.STATUS_INSIDE);
+				battlePk.setRoomStatus(BattlePk.ROOM_STATUS_FREE);
+				battlePk.setRoomId("");
+				battlePkService.update(battlePk);
+			}
+		}
+		
 		if(battlePk.getRoomStatus()==BattlePk.ROOM_STATUS_CALL||battlePk.getRoomStatus()==BattlePk.ROOM_STATUS_FREE){
 			
 			Integer beatStatus = battlePk.getBeatStatus();
@@ -186,6 +199,8 @@ public class BattlePkHandleService {
 				battlePkService.update(battlePk);
 			}
 		}
+		
+		
 		
 		return battlePk;
 	}

@@ -63,6 +63,50 @@ public class BattlePkSyncApi {
 	final static Logger logger = LoggerFactory.getLogger(BattlePkSyncApi.class);
 	
 	
+	@RequestMapping(value="beatOut")
+	@ResponseBody
+	@HandlerAnnotation(hanlerFilter=LoginStatusFilter.class)
+	public ResultVo beatOut(HttpServletRequest httpServletRequest)throws Exception{
+		
+		SessionManager sessionManager = SessionManager.getFilterManager(httpServletRequest);
+
+		
+		UserInfo userInfo = sessionManager.getObject(UserInfo.class);
+		String id = httpServletRequest.getParameter("id");
+		
+		BattlePk battlePk = battlePkService.findOne(id);
+		
+		
+		if(CommonUtil.isEmpty(battlePk.getBeatUserId())){
+			ResultVo resultVo = new ResultVo();
+			resultVo.setSuccess(false);
+			resultVo.setErrorMsg("没有客场选手");
+			return resultVo;
+		}
+		
+		if(!battlePk.getBeatUserId().equals(userInfo.getId())){
+			ResultVo resultVo = new ResultVo();
+			resultVo.setSuccess(false);
+			resultVo.setErrorMsg("客场选手不符合");
+			return resultVo;
+		}
+
+		
+		battlePk.setBeatUserImgurl("");
+		battlePk.setBeatUserId("");
+		battlePk.setBeatStatus(BattlePk.STATUS_LEAVE);
+		
+		battlePkService.update(battlePk);
+	
+		pkSocketService.statusPublish(battlePk);
+		
+		ResultVo resultVo = new ResultVo();
+		resultVo.setSuccess(true);
+		
+		return resultVo;
+	}
+	
+	
 	@RequestMapping(value="ready")
 	@ResponseBody
 	@Transactional
@@ -170,9 +214,12 @@ public class BattlePkSyncApi {
 			battleRoomService.update(oldBattleRoom);
 			
 			final BattlePeriodMember battlePeriodMember = battlePeriodMemberService.findOneByRoomIdAndUserIdAndIsDel(oldBattleRoom.getId(), userInfo.getId(), 0);
-			battlePeriodMember.setLoveResidule(0);
 			
-			battlePeriodMemberService.update(battlePeriodMember);
+			if(battlePeriodMember!=null){
+				battlePeriodMember.setLoveResidule(0);
+				
+				battlePeriodMemberService.update(battlePeriodMember);
+			}
 			
 			battleEndSocketService.endPublish(oldBattleRoom.getId());
 			

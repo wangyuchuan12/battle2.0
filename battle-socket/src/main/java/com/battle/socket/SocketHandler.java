@@ -102,7 +102,7 @@ public class SocketHandler extends TextWebSocketHandler {
 			}
 		};
 		
-		executorService.schedule(timerTask,500,TimeUnit.MILLISECONDS);
+		executorService.schedule(timerTask,90,TimeUnit.MILLISECONDS);
     	
 		/*
     	onlineListener.downLine(userId.toString());
