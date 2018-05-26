@@ -13,8 +13,11 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import com.battle.domain.BattlePeriod;
+import com.battle.domain.BattlePeriodMember;
 import com.battle.domain.BattleStageRestMember;
 import com.battle.domain.UserStatus;
+import com.battle.service.BattlePeriodMemberService;
 import com.battle.service.BattleStageRestMemberService;
 import com.battle.service.UserStatusService;
 import com.battle.socket.service.BattleStageRestPublishService;
@@ -39,6 +42,9 @@ public class OnlineListener {
 	
 	@Autowired
 	private BattleStageRestPublishService battleStageRestPublishService;
+	
+	@Autowired
+	private BattlePeriodMemberService battlePeriodMemberService;
 
 	final static Logger logger = LoggerFactory.getLogger(OnlineListener.class);
 	public synchronized void onLine(final String id){
@@ -139,6 +145,12 @@ public class OnlineListener {
 					logger.error("{}",e);
 				}
 			}
+		}
+		
+		List<BattlePeriodMember> battlePeriodMembers = battlePeriodMemberService.findAllByUserIdAndStatus(userInfo.getId(),BattlePeriodMember.STATUS_IN);
+		for(BattlePeriodMember battlePeriodMember:battlePeriodMembers){
+			battlePeriodMember.setStatus(BattlePeriodMember.STATUS_OUT);
+			battlePeriodMemberService.update(battlePeriodMember);
 		}
 		
 		String statusId = userInfo.getStatusId();

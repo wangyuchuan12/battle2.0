@@ -209,4 +209,9 @@ public class BattlePeriodMemberService {
 		
 		return battlePeriodMemberDao.findAllByBattleIdAndPeriodIdAndRoomId(battleId,periodId,roomId,pageable);
 	}
+
+	public List<BattlePeriodMember> findAllByUserIdAndStatus(String userId, Integer status) {
+		
+		return battlePeriodMemberDao.findAllByUserIdAndStatus(userId,status);
+	}
 }
