@@ -208,7 +208,7 @@ public class QuestionApi {
 		
 		ResultVo resultVo = new ResultVo();
 		
-		if(question.getType()==Question.SELECT_TYPE){
+		if(question.getType().intValue()==Question.SELECT_TYPE){
 			String optionId = httpServletRequest.getParameter("optionId");
 			
 			if(CommonUtil.isEmpty(optionId)){
@@ -236,6 +236,10 @@ public class QuestionApi {
 			}
 			
 			
+			
+			System.out.println(".........optionId:"+optionId);
+			System.out.println(".........rightOption:"+rightOption.getContent());
+			System.out.println(".........question:"+question.getRightOptionId());
 			questionAnswerItem.setMyOptionId(optionId);
 			questionAnswerItem.setRightAnswer(rightOption.getContent());
 			questionAnswerItem.setRightOptionId(question.getRightOptionId());
@@ -261,7 +265,7 @@ public class QuestionApi {
 			
 			
 			
-		}else if(question.getType()==Question.INPUT_TYPE){
+		}else if(question.getType().intValue()==Question.INPUT_TYPE){
 			String answer = httpServletRequest.getParameter("answer");
 			
 			questionAnswerItem.setMyAnswer(answer);
@@ -280,7 +284,7 @@ public class QuestionApi {
 			resultVo.setSuccess(true);
 			resultVo.setData(result);
 			
-		}else if(question.getType()==Question.FILL_TYPE){
+		}else if(question.getType().intValue()==Question.FILL_TYPE){
 			String answer = httpServletRequest.getParameter("answer");
 			
 			
@@ -319,6 +323,10 @@ public class QuestionApi {
 			process = 0;
 		}
 		
+		System.out.println("..............questionAnswerItem.getIsRight:"+questionAnswerItem.getIsRight());
+		System.out.println("..............questionAnswerItem.type:"+questionAnswerItem.getType());
+		System.out.println("..............questionAnswerItem.rightOptionId:"+questionAnswerItem.getRightOptionId());
+		Integer loveDiff = 0;
 		if(questionAnswerItem.getIsRight()==1){
 			Integer paperScore = battleMemberPaperAnswer.getScore();
 			if(paperScore==null){
@@ -335,6 +343,14 @@ public class QuestionApi {
 			Integer score = battlePeriodMember.getScore();
 			
 			battlePeriodMember.setScore(score+rightAddScore);
+			
+			Integer loveResidule = battlePeriodMember.getLoveResidule();
+			if(loveResidule<battlePeriodMember.getLoveCount()){
+				loveResidule++;
+				loveDiff = 1;
+			}
+			battlePeriodMember.setLoveResidule(loveResidule);
+			
 		}else{
 			Integer paperScore = battleMemberPaperAnswer.getScore();
 			if(paperScore==null){
@@ -360,7 +376,10 @@ public class QuestionApi {
 					battleMemberLoveCoolingService.update(battleMemberLoveCooling);
 				}
 			}
-			loveResidule--;
+			if(loveResidule>0){
+				loveResidule--;
+				loveDiff = -1;
+			}
 			battlePeriodMember.setLoveResidule(loveResidule);
 			
 			questionAnswer.setWrongSum(questionAnswer.getWrongSum()+1);
@@ -506,7 +525,7 @@ public class QuestionApi {
 		sessionManager.update(questionAnswer);
 		sessionManager.update(battleMemberPaperAnswer);
 	
-		progressStatusSocketService.statusPublish(battlePeriodMember.getRoomId(),battlePeriodMember,battleMemberPaperAnswer);
+		progressStatusSocketService.statusPublish(battlePeriodMember.getRoomId(),battlePeriodMember,battleMemberPaperAnswer,questionAnswerItem,loveDiff);
 		
 		return resultVo;
 	}

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.battle.domain.BattleMemberPaperAnswer;
 import com.battle.domain.BattlePeriodMember;
 import com.battle.domain.BattleRoom;
+import com.battle.domain.QuestionAnswerItem;
 import com.battle.service.BattlePeriodMemberService;
 import com.battle.service.BattleRoomService;
 import com.battle.socket.MessageHandler;
@@ -32,7 +33,12 @@ public class ProgressStatusSocketService {
 	
 	@Autowired
 	private ScheduledExecutorService executorService;
-	public void statusPublish(final String roomId,final BattlePeriodMember battlePeriodMember,final BattleMemberPaperAnswer battleMemberPaperAnswer){
+	public void statusPublish(
+			final String roomId,
+			final BattlePeriodMember battlePeriodMember,
+			final BattleMemberPaperAnswer battleMemberPaperAnswer,
+			final QuestionAnswerItem questionAnswerItem,
+			final Integer loveDiff){
 		
 		Thread thread = new Thread(){
 			public void run() {
@@ -49,6 +55,8 @@ public class ProgressStatusSocketService {
 				progressStatusVo.setThisProcess(battleMemberPaperAnswer.getProcess());
 				progressStatusVo.setRoomStatus(battleroom.getStatus());
 				progressStatusVo.setStageIndex(battlePeriodMember.getStageIndex());
+				progressStatusVo.setLoveDiff(loveDiff);
+				progressStatusVo.setIsRight(questionAnswerItem.getIsRight());
 				progressStatusVos.add(progressStatusVo);
 				MessageVo messageVo = new MessageVo();
 				

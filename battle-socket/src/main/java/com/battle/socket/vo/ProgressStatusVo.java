@@ -18,6 +18,10 @@ public class ProgressStatusVo {
 	
 	private Integer stageIndex;
 	
+	private Integer isRight;
+	
+	private Integer loveDiff;
+	
 	public Integer getRoomStatus() {
 		return roomStatus;
 	}
@@ -81,4 +85,24 @@ public class ProgressStatusVo {
 	public void setStageIndex(Integer stageIndex) {
 		this.stageIndex = stageIndex;
 	}
+
+	public Integer getIsRight() {
+		return isRight;
+	}
+
+	public void setIsRight(Integer isRight) {
+		this.isRight = isRight;
+	}
+
+	public Integer getLoveDiff() {
+		return loveDiff;
+	}
+
+	public void setLoveDiff(Integer loveDiff) {
+		this.loveDiff = loveDiff;
+	}
+	
+	
+	
+	
 }
