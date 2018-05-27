@@ -2,14 +2,17 @@ package com.battle.service;
 
 import java.util.UUID;
 
+import javax.persistence.LockModeType;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.support.SimpleCacheManager;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 
 import com.battle.dao.UserStatusDao;
 import com.battle.domain.UserStatus;
+import com.wyc.common.session.EhRedisCache;
 
 @Service
 public class UserStatusService {
@@ -17,7 +20,11 @@ public class UserStatusService {
 	@Autowired
 	private UserStatusDao userStatusDao;
 
+	@Autowired
+	private SimpleCacheManager ehRedisCacheManager;
 
+	@Cacheable(value="userCache",key="#p0") 
+	@Lock(value=LockModeType.PESSIMISTIC_WRITE)
 	public UserStatus findOne(String id) {
 		
 		return userStatusDao.findOne(id);
@@ -31,27 +38,31 @@ public class UserStatusService {
 		userStatus.setCreateAt(new DateTime());
 		userStatus.setUpdateAt(new DateTime());
 		
-		userStatusDao.save(userStatus);
+		//userStatusDao.save(userStatus);
+		
+		EhRedisCache ehRedisCache = (EhRedisCache) ehRedisCacheManager.getCache("userCache");
+		ehRedisCache.put(userStatus.getId(), userStatus);
 		
 	}
 
 
 	public void update(UserStatus userStatus) {
-		
 		userStatus.setUpdateAt(new DateTime());
-		userStatusDao.save(userStatus);
+		//userStatusDao.save(userStatus);
+		
+		EhRedisCache ehRedisCache = (EhRedisCache) ehRedisCacheManager.getCache("userCache");
+		ehRedisCache.put(userStatus.getId(), userStatus);
+		
+		ehRedisCache.put("userStatusByUserId_"+userStatus.getUserId(), userStatus);
 		
 	}
 
 
+	
+	
+	@Cacheable(value="userCache",key="userStatusByUserId_#p0") 
 	public UserStatus findOneByUserId(String userId) {
 		
 		return userStatusDao.findOneByUserId(userId);
-	}
-
-
-	public Page<UserStatus> findAllByIsLine(int isLine, Pageable pageable) {
-		
-		return userStatusDao.findAllByIsLine(isLine,pageable);
 	}
 }

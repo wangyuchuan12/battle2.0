@@ -43,7 +43,7 @@ public class MessageHandler {
 		
 		List<String> excludeUserIds = messageVo.getExcludeUserIds();
 		List<String> tokens = new ArrayList<>();
-		if(messageVo.getType()==MessageVo.ALL_ONLINE_TYPE){
+		/*if(messageVo.getType()==MessageVo.ALL_ONLINE_TYPE){
 			Pageable pageable = new PageRequest(0, 100);
 			Page<UserStatus> userInfoPage = userStatusService.findAllByIsLine(1,pageable);
 			
@@ -56,7 +56,7 @@ public class MessageHandler {
 					}
 				}
 			}
-		}
+		}*/
 		
 		if(messageVo.getType()==MessageVo.ROOM_TYPE){
 			BattleRoom battleRoom = battleRoomService.findOne(messageVo.getRoomId());
