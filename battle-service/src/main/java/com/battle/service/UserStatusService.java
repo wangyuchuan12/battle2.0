@@ -5,6 +5,7 @@ import java.util.UUID;
 import javax.persistence.LockModeType;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache.ValueWrapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.data.jpa.repository.Lock;
@@ -62,7 +63,12 @@ public class UserStatusService {
 	public UserStatus findOneByUserId(String userId) {
 		
 		EhRedisCache ehRedisCache = (EhRedisCache) ehRedisCacheManager.getCache("userCache");
-		UserStatus userStatus = (UserStatus)ehRedisCache.get("userStatusByUserId_"+userId).get();
+		ValueWrapper valueWrapper = ehRedisCache.get("userStatusByUserId_"+userId);
+		UserStatus userStatus = null;
+		
+		if(valueWrapper!=null){
+			userStatus = (UserStatus)valueWrapper.get();
+		}
 		if(userStatus==null){
 			return userStatusDao.findOneByUserId(userId);
 		}else{
