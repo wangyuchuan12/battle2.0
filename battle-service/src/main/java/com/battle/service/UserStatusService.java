@@ -38,7 +38,7 @@ public class UserStatusService {
 		userStatus.setCreateAt(new DateTime());
 		userStatus.setUpdateAt(new DateTime());
 		
-		//userStatusDao.save(userStatus);
+		userStatusDao.save(userStatus);
 		
 		EhRedisCache ehRedisCache = (EhRedisCache) ehRedisCacheManager.getCache("userCache");
 		ehRedisCache.put(userStatus.getId(), userStatus);
@@ -48,7 +48,7 @@ public class UserStatusService {
 
 	public void update(UserStatus userStatus) {
 		userStatus.setUpdateAt(new DateTime());
-		//userStatusDao.save(userStatus);
+		userStatusDao.save(userStatus);
 		
 		EhRedisCache ehRedisCache = (EhRedisCache) ehRedisCacheManager.getCache("userCache");
 		ehRedisCache.put(userStatus.getId(), userStatus);
@@ -59,10 +59,14 @@ public class UserStatusService {
 
 
 	
-	
-	@Cacheable(value="userCache",key="userStatusByUserId_#p0") 
 	public UserStatus findOneByUserId(String userId) {
 		
-		return userStatusDao.findOneByUserId(userId);
+		EhRedisCache ehRedisCache = (EhRedisCache) ehRedisCacheManager.getCache("userCache");
+		UserStatus userStatus = (UserStatus)ehRedisCache.get("userStatusByUserId_"+userId);
+		if(userStatus==null){
+			return userStatusDao.findOneByUserId(userId);
+		}else{
+			return userStatus;
+		}
 	}
 }
