@@ -62,7 +62,7 @@ public class UserStatusService {
 	public UserStatus findOneByUserId(String userId) {
 		
 		EhRedisCache ehRedisCache = (EhRedisCache) ehRedisCacheManager.getCache("userCache");
-		UserStatus userStatus = (UserStatus)ehRedisCache.get("userStatusByUserId_"+userId);
+		UserStatus userStatus = (UserStatus)ehRedisCache.get("userStatusByUserId_"+userId).get();
 		if(userStatus==null){
 			return userStatusDao.findOneByUserId(userId);
 		}else{
