@@ -53,7 +53,7 @@ public class BattleWaitSocketService {
 					logger.error("{}",e);
 				}
 			}
-		},1,TimeUnit.SECONDS);
+		},5,TimeUnit.SECONDS);
 	}
 	
 	public void waitPublish(final BattleWaitUser user)throws Exception{

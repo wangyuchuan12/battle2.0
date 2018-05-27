@@ -19,10 +19,9 @@ public interface UserStatusDao extends CrudRepository<UserStatus, String>{
 	@Lock(value=LockModeType.PESSIMISTIC_WRITE)
 	UserStatus findOne(String id);
 
-	@QueryHints({@QueryHint(name ="org.hibernate.cacheable", value ="true") })
+
 	UserStatus findOneByUserId(String userId);
 
-	@QueryHints({@QueryHint(name ="org.hibernate.cacheable", value ="true") })
 	Page<UserStatus> findAllByIsLine(int isLine, Pageable pageable);
 
 }

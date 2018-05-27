@@ -38,6 +38,6 @@ public class RoomStartTask {
 			}
 		};
 		
-		timer.schedule(timerTask, 5000);
+		timer.schedule(timerTask, 2000);
 	}
 }
