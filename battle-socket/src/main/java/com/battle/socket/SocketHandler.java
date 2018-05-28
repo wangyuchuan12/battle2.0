@@ -7,7 +7,9 @@ import com.wyc.common.util.CommonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -30,7 +32,7 @@ public class SocketHandler extends TextWebSocketHandler {
 	private DataViewService dataViewService;
     
     @Autowired
-    private OnlineListener onlineListener;
+    private AutowireCapableBeanFactory factory;
     
     @Autowired
     private ScheduledExecutorService executorService;
@@ -64,6 +66,9 @@ public class SocketHandler extends TextWebSocketHandler {
 				System.out.println("...............尊贵和荣耀");
 				logger.debug("put session delay 1000 run");
 				sessionMap.put(token.toString(),session);
+				
+				OnlineListener onlineListener = new OnlineListener();
+				factory.autowireBean(onlineListener);
 				onlineListener.onLine(userId.toString());
 
 				try{
@@ -96,7 +101,9 @@ public class SocketHandler extends TextWebSocketHandler {
 			
 			@Override
 			public void run() {
+				OnlineListener onlineListener = new OnlineListener();
 				
+				factory.autowireBean(onlineListener);
 				System.out.println("...............尊贵和荣耀2");
 				onlineListener.downLine(userId.toString());
 			}
