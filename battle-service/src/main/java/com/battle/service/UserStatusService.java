@@ -24,8 +24,7 @@ public class UserStatusService {
 	@Autowired
 	private SimpleCacheManager ehRedisCacheManager;
 
-	@Cacheable(value="userCache",key="#p0") 
-	@Lock(value=LockModeType.PESSIMISTIC_WRITE)
+	@Cacheable(value="userCache",key="#p0")
 	public UserStatus findOne(String id) {
 		
 		return userStatusDao.findOne(id);
@@ -43,6 +42,7 @@ public class UserStatusService {
 		
 		EhRedisCache ehRedisCache = (EhRedisCache) ehRedisCacheManager.getCache("userCache");
 		ehRedisCache.put(userStatus.getId(), userStatus);
+		ehRedisCache.put("userStatusByUserId_"+userStatus.getUserId(), userStatus);
 		
 	}
 
