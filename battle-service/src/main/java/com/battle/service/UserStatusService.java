@@ -70,9 +70,15 @@ public class UserStatusService {
 			userStatus = (UserStatus)valueWrapper.get();
 		}
 		if(userStatus==null){
-			return userStatusDao.findOneByUserId(userId);
+			userStatus = userStatusDao.findOneByUserId(userId);
 		}else{
-			return userStatus;
+			
 		}
+		
+		if(userStatus!=null){
+			ehRedisCache.put("userStatusByUserId_"+userStatus.getUserId(), userStatus);
+		}
+		
+		return userStatus;
 	}
 }

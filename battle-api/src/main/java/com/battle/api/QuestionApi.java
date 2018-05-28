@@ -628,6 +628,10 @@ public class QuestionApi {
 		
 		data.put("stageIndex",battlePeriodMember.getStageIndex());
 		
+		data.put("title",battlePeriodStage.getTitle());
+		
+		data.put("subtitle",battlePeriodStage.getSubtitle());
+		
 		resultVo.setData(data);
 		
 		resultVo.setSuccess(true);

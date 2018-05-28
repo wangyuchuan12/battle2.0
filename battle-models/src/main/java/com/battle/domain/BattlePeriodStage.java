@@ -64,6 +64,18 @@ public class BattlePeriodStage implements Serializable{
 	@Column(name="cost_bean")
 	private Integer costBean;
 	
+	
+	//副标题
+	@ParamAnnotation
+	@Column(name="sub_title")
+	private Integer subtitle;
+	
+	
+	//标题
+	@ParamAnnotation
+	@Column
+	private Integer title;
+	
 	@ParamAnnotation
 	@Column(name = "create_at")
     @Type(type="org.jadira.usertype.dateandtime.joda.PersistentDateTime")
@@ -142,6 +154,22 @@ public class BattlePeriodStage implements Serializable{
 
 	public void setCostBean(Integer costBean) {
 		this.costBean = costBean;
+	}
+
+	public Integer getSubtitle() {
+		return subtitle;
+	}
+
+	public void setSubtitle(Integer subtitle) {
+		this.subtitle = subtitle;
+	}
+
+	public Integer getTitle() {
+		return title;
+	}
+
+	public void setTitle(Integer title) {
+		this.title = title;
 	}
 
 	public DateTime getCreateAt() {
